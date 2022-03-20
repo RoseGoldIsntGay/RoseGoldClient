@@ -82,7 +82,7 @@ Cheater get spectated.
   - clear: Clears the filter
 
 #### - /spellaura
-- Manages the sPELL Aura custom filter
+- Manages the Spell Aura custom filter
 - Aliases: /sa
 - Arguments: 
   - none: Displays current active filters
