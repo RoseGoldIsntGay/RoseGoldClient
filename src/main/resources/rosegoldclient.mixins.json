@@ -1,0 +1,22 @@
+{
+  "required": true,
+  "package": "rosegoldclient.mixins",
+  "compatibilityLevel": "JAVA_8",
+  "refmap": "rosegoldclient.refmap.json",
+  "mixins": [
+    "MixinEntityLivingBase",
+    "MixinNetHandlerLoginServer"
+  ],
+  "client": [
+    "C03Accessor",
+    "MixinAbstractClientPlayer",
+    "MixinBlock",
+    "MixinEntityPlayerSP",
+    "MixinEntityRender",
+    "MixinFMLHandShake",
+    "MixinGuiDisconnected",
+    "MixinNetworkManager",
+    "MixinRenderString"
+  ],
+  "minVersion": "0.8"
+}

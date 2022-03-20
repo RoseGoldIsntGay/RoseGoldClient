@@ -1,0 +1,15 @@
+[
+{
+  "modid": "rosegoldclient",
+  "name": "RoseGoldClient",
+  "description": "RoseGold's Client",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["RoseGold"],
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
