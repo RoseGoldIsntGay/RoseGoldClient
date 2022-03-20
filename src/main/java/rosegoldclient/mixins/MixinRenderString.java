@@ -62,6 +62,7 @@ public abstract class MixinRenderString {
     }
 
     private String doNameThing(String text) {
+        if(text.contains("Randomize Text") || text.contains("Randomize text")) return text;
         if(Config.anon) {
             if (Config.randomizeAnon) {
                 StringBuilder sb = new StringBuilder();

@@ -80,6 +80,7 @@ public class Main {
     public static List<String> shuffle = Arrays.asList("0123456789 abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".split(""));
 
     public static boolean firstLogin = false;
+    public static boolean anyLogin = true;
     public static boolean banned = false;
     private boolean issue = false;
     private String id = "";
@@ -202,7 +203,7 @@ public class Main {
 
     @SubscribeEvent
     public void onTick(TickEndEvent event) {
-        if (mc.player == null) return;
+        if (mc.player == null || mc.world == null) return;
         if (guiToOpen != null) {
             mc.displayGuiScreen(guiToOpen);
             guiToOpen = null;
@@ -213,11 +214,17 @@ public class Main {
         }
         if (firstLogin && banned) {
             firstLogin = false;
-            ITextComponent iTextComponent = new TextComponentString("§7This seems like your first time using RoseGoldClient, visit §bhttps://github.com/RoseGoldIsntGay/RGC/blob/main/README.md§7 to learn more");
-            iTextComponent.getStyle().setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://github.com/RoseGoldIsntGay/RGC/blob/main/README.md"));
-            iTextComponent.getStyle().setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponentString(TextFormatting.YELLOW + "Open: https://github.com/RoseGoldIsntGay/RGC/blob/main/README.md")));
-
+            ITextComponent iTextComponent = new TextComponentString("§7This seems like your first time using RoseGoldClient, visit §bhttps://github.com/RoseGoldIsntGay/RoseGoldClient§7 to learn more");
+            iTextComponent.getStyle().setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://github.com/RoseGoldIsntGay/RoseGoldClient"));
+            iTextComponent.getStyle().setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponentString(TextFormatting.YELLOW + "Open: https://github.com/RoseGoldIsntGay/RoseGoldClient")));
             mc.player.sendMessage(iTextComponent);
+        }
+        if(anyLogin && !firstLogin) {
+            anyLogin = false;
+            ITextComponent itc2 = new TextComponentString("§0§7Thanks to ShadyAddons:§b https://shadyaddons.com/");
+            itc2.getStyle().setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "http://shadyaddons.com/"));
+            itc2.getStyle().setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponentString(TextFormatting.YELLOW + "Open: https://shadyaddons.com/")));
+            mc.player.sendMessage(itc2);
         }
     }
 
