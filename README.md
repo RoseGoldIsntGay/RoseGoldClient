@@ -16,8 +16,6 @@ Cheater get spectated.
 - Configurable speed
 </details>
 
-<details><summary>Kill Aura</summary>
-
 <details><summary>Entity ESP</summary>
 
 - Highlight wynncraft entities
