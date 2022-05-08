@@ -1,4 +1,3 @@
-
 # RoseGoldClient
 Cheater get spectated.
 
