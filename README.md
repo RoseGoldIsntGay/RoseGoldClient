@@ -1,3 +1,4 @@
+
 # RoseGoldClient
 Cheater get spectated.
 
@@ -10,6 +11,22 @@ Cheater get spectated.
 - Chest ESP
 </details>
 
+<details><summary>Chest Looter</summary>
+
+- Loot items from chests
+- Configurable speed
+</details>
+
+<details><summary>Kill Aura</summary>
+
+<details><summary>Entity ESP</summary>
+
+- Highlight wynncraft entities
+- 🌈 Colorful 🌈
+- Nametag and distance
+- Configurable range
+</details>
+
 <details><summary>Kill Aura</summary>
   
 - Automatically attack nearby entities
@@ -18,9 +35,9 @@ Cheater get spectated.
 - Toggle with keybind
 </details>
 
-<details><summary>NoRotate</summary>
+<details><summary>No Rotate</summary>
   
-- No Rotate (Client side)
+- Prevent the server from setting your rotation
 </details>
 
 <details><summary>Phase</summary>
@@ -40,6 +57,12 @@ Cheater get spectated.
 <details><summary>Spell Caster</summary>
   
 - Set a keybind to cast spells automagically
+</details>
+
+<details><summary>Velocity</summary>
+  
+- Change player velocity multiplier
+- Configurable with /velocity or in the GUI
 </details>
 
 <details><summary>Wynncraft Chest ESP</summary>
@@ -111,3 +134,9 @@ Cheater get spectated.
 - To test the block ban packet module
 - Arguments: 
   - none
+
+#### - /velocity
+- Set player velocity multiplier
+- Aliases: /velo
+- Arguments:
+	- x, y, z
