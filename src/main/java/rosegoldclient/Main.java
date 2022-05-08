@@ -29,16 +29,12 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
+import net.minecraftforge.fml.common.network.FMLNetworkEvent;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.lwjgl.input.Keyboard;
 import rosegoldclient.commands.*;
-import rosegoldclient.config.Config;
-import rosegoldclient.config.ConfigLogic;
-import rosegoldclient.config.MainCommand;
-import rosegoldclient.config.settings.Setting;
 import rosegoldclient.events.KeybindEnabledEvent;
 import rosegoldclient.events.SecondEvent;
-import rosegoldclient.events.SettingChangeEvent;
 import rosegoldclient.events.TickEndEvent;
 import rosegoldclient.features.*;
 import rosegoldclient.utils.ArrayUtils;
@@ -62,14 +58,16 @@ import java.util.concurrent.TimeUnit;
 public class Main {
     public static final String MODID = "rosegoldclient";
     public static final String NAME = "RoseGoldClient";
-    public static final String VERSION = "0.2.1";
+    public static final String VERSION = "1.0.0";
 
     public static Minecraft mc = Minecraft.getMinecraft();
+
+    public static GuiScreen display = null;
+    public static Config configFile = Config.INSTANCE;
 
     public static ArrayList<String> cheater = new ArrayList<>();
     public static GuiScreen guiToOpen = null;
     public static JsonObject rgc;
-    public static ArrayList<Setting> settings = ConfigLogic.collect(Config.class);
     public static ArrayList<KeyBinding> keybinds = new ArrayList<>();
 
     public static boolean killAura = false;
@@ -130,9 +128,7 @@ public class Main {
             issue = true;
         }
 
-        ClientCommandHandler.instance.registerCommand(new MainCommand());
         id = mc.getSession().getPlayerID();
-        ConfigLogic.load();
     }
 
     @EventHandler
@@ -153,10 +149,10 @@ public class Main {
         keybinds.add(new KeyBinding("Phase", Keyboard.KEY_NONE, "RoseGoldClient - Movement")); //1
         keybinds.add(new KeyBinding("Spell Aura", Keyboard.KEY_NONE, "RoseGoldClient - Combat")); //2
         keybinds.add(new KeyBinding("Copy NBT Data", Keyboard.KEY_NONE, "RoseGoldClient")); //3
-        keybinds.add(new KeyBinding("Cast RRR", Keyboard.KEY_NONE, "RoseGoldClient - Macros")); //4
-        keybinds.add(new KeyBinding("Cast RLR", Keyboard.KEY_NONE, "RoseGoldClient - Macros")); //5
-        keybinds.add(new KeyBinding("Cast RLL", Keyboard.KEY_NONE, "RoseGoldClient - Macros")); //6
-        keybinds.add(new KeyBinding("Cast RRL", Keyboard.KEY_NONE, "RoseGoldClient - Macros")); //7
+        keybinds.add(new KeyBinding("Cast RRR", Keyboard.KEY_NONE, "RoseGoldClient")); //4
+        keybinds.add(new KeyBinding("Cast RLR", Keyboard.KEY_NONE, "RoseGoldClient")); //5
+        keybinds.add(new KeyBinding("Cast RLL", Keyboard.KEY_NONE, "RoseGoldClient")); //6
+        keybinds.add(new KeyBinding("Cast RRL", Keyboard.KEY_NONE, "RoseGoldClient")); //7
 
         MinecraftForge.EVENT_BUS.register(new TickEndEvent());
         MinecraftForge.EVENT_BUS.register(this);
@@ -170,13 +166,19 @@ public class Main {
         MinecraftForge.EVENT_BUS.register(new SpellAura());
         MinecraftForge.EVENT_BUS.register(new SpellCaster());
         MinecraftForge.EVENT_BUS.register(new WynncraftChestESP());
+        MinecraftForge.EVENT_BUS.register(new EntityESP());
+        MinecraftForge.EVENT_BUS.register(new ChestLooter());
 
+        configFile.initialize();
+
+        ClientCommandHandler.instance.registerCommand(new MainCommand());
         ClientCommandHandler.instance.registerCommand(new KillAuraFilter());
         ClientCommandHandler.instance.registerCommand(new SpellAuraFilter());
         ClientCommandHandler.instance.registerCommand(new SelfBan());
         ClientCommandHandler.instance.registerCommand(new AddChest());
         ClientCommandHandler.instance.registerCommand(new RemoveChest());
         ClientCommandHandler.instance.registerCommand(new SaveChests());
+        ClientCommandHandler.instance.registerCommand(new ChangeVelocity());
 
         for (KeyBinding keyBinding : keybinds) {
             ClientRegistry.registerKeyBinding(keyBinding);
@@ -189,20 +191,18 @@ public class Main {
     public void postInit(FMLPostInitializationEvent event) {
         LocalDateTime now = LocalDateTime.now();
         Duration initialDelay = Duration.between(now, now);
-        long initalDelaySeconds = initialDelay.getSeconds();
+        long initialDelaySeconds = initialDelay.getSeconds();
 
-        Executors.newScheduledThreadPool(1).scheduleAtFixedRate(() -> MinecraftForge.EVENT_BUS.post(new SecondEvent()), initalDelaySeconds, 1, TimeUnit.SECONDS);
+        Executors.newScheduledThreadPool(1).scheduleAtFixedRate(() -> MinecraftForge.EVENT_BUS.post(new SecondEvent()), initialDelaySeconds, 1, TimeUnit.SECONDS);
     }
 
     @SubscribeEvent
-    public void onSettingsChanges(SettingChangeEvent event) {
-        if (event.setting.name.equals("Randomize Text")) {
-            Collections.shuffle(shuffle);
-        }
+    public void onServerConnect(FMLNetworkEvent.ClientConnectedToServerEvent event) {
+        event.getManager().channel().pipeline().addBefore("packet_handler", "velocity modifier", new Velocity());
     }
 
     @SubscribeEvent
-    public void onTick(TickEndEvent event) {
+    public void onTickEnd(TickEndEvent event) {
         if (mc.player == null || mc.world == null) return;
         if (guiToOpen != null) {
             mc.displayGuiScreen(guiToOpen);
@@ -214,17 +214,37 @@ public class Main {
         }
         if (firstLogin && banned) {
             firstLogin = false;
-            ITextComponent iTextComponent = new TextComponentString("§7This seems like your first time using RoseGoldClient, visit §bhttps://github.com/RoseGoldIsntGay/RoseGoldClient§7 to learn more");
-            iTextComponent.getStyle().setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://github.com/RoseGoldIsntGay/RoseGoldClient"));
-            iTextComponent.getStyle().setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponentString(TextFormatting.YELLOW + "Open: https://github.com/RoseGoldIsntGay/RoseGoldClient")));
-            mc.player.sendMessage(iTextComponent);
+            ITextComponent msg1 = new TextComponentString("§7This seems like your first time using RoseGoldClient, visit §bhttps://github.com/RoseGoldIsntGay/RoseGoldClient§7 to learn more");
+            msg1.getStyle().setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://github.com/RoseGoldIsntGay/RoseGoldClient"));
+            msg1.getStyle().setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponentString(TextFormatting.YELLOW + "Open: https://github.com/RoseGoldIsntGay/RoseGoldClient")));
+            mc.player.sendMessage(msg1);
         }
         if(anyLogin && !firstLogin) {
             anyLogin = false;
-            ITextComponent itc2 = new TextComponentString("§0§7Thanks to ShadyAddons:§b https://shadyaddons.com/");
-            itc2.getStyle().setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "http://shadyaddons.com/"));
-            itc2.getStyle().setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponentString(TextFormatting.YELLOW + "Open: https://shadyaddons.com/")));
-            mc.player.sendMessage(itc2);
+            Utils.sendModMessage("");
+            ITextComponent msg1 = new TextComponentString("§0§7Thanks to ShadyAddons: §bhttps://shadyaddons.com/");
+            msg1.getStyle().setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "http://shadyaddons.com/"));
+            msg1.getStyle().setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponentString(TextFormatting.YELLOW + "Open: https://shadyaddons.com/")));
+            mc.player.sendMessage(msg1);
+            ITextComponent msg2 = new TextComponentString("§0§7Thanks to Harry282 (SBClient): §bhttps://github.com/Harry282/Skyblock-Client");
+            msg2.getStyle().setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://github.com/Harry282/Skyblock-Client"));
+            msg2.getStyle().setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponentString(TextFormatting.YELLOW + "Open: https://github.com/Harry282/Skyblock-Client")));
+            mc.player.sendMessage(msg2);
+            ITextComponent msg3 = new TextComponentString("§0§7Thanks to hael9 (yes, that hael9).");
+            mc.player.sendMessage(msg3);
+            ITextComponent ms4 = new TextComponentString("§0§7Thanks to the Necron Discord: §bhttps://discord.gg/necron");
+            ms4.getStyle().setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://discord.gg/necron"));
+            ms4.getStyle().setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponentString(TextFormatting.YELLOW + "Open: https://discord.gg/necron")));
+            mc.player.sendMessage(ms4);
+        }
+
+        if(display != null) {
+            try {
+                mc.displayGuiScreen(display);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            display = null;
         }
     }
 

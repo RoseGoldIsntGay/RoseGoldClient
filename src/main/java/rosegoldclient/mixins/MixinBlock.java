@@ -11,7 +11,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import rosegoldclient.Main;
-import rosegoldclient.config.Config;
 import rosegoldclient.features.Phase;
 
 @Mixin(Block.class)
@@ -21,7 +20,7 @@ public abstract class MixinBlock {
 
     @Inject(method = "getCollisionBoundingBox", at = @At("HEAD"), cancellable = true)
     private void getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos, CallbackInfoReturnable<AxisAlignedBB> cir) {
-        if(Config.phase) {
+        if(Main.configFile.phase) {
             if(Phase.phaseable.contains(pos)) {
                 if(shouldGB(blockState, worldIn, pos)) {
                     cir.setReturnValue(null);
@@ -32,7 +31,7 @@ public abstract class MixinBlock {
 
     @Inject(method = "isFullCube", at = @At("HEAD"), cancellable = true)
     private void isFullCube(IBlockState state, CallbackInfoReturnable<Boolean> cir) {
-        if(Config.phase) {
+        if(Main.configFile.phase) {
             cir.setReturnValue(false);
         }
     }

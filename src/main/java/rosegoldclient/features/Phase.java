@@ -6,7 +6,6 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
 import rosegoldclient.Main;
-import rosegoldclient.config.Config;
 import rosegoldclient.events.TickEndEvent;
 
 import java.util.HashSet;
@@ -49,7 +48,7 @@ public class Phase {
         if (!isEnabled()) return;
         Vec3d playerVec = Main.mc.player.getPositionVector();
         BlockPos playerPosition = new BlockPos(playerVec.x, playerVec.y, playerVec.z);
-        if(Config.sneakHeldDescent) {
+        if(Main.configFile.sneakHeldDescent) {
             if(sneak.isKeyDown()) {
                 for (int x = playerPosition.getX() - range; x < playerPosition.getX() + range + 1; x++) {
                     for (int y = playerPosition.getY() - 1; y < playerPosition.getY(); y++) {
@@ -66,7 +65,7 @@ public class Phase {
     public void keyPress(InputEvent.KeyInputEvent event) {
         if (Main.mc.player == null || Main.mc.world == null) return;
         if (!isEnabled()) return;
-        if(Config.sneakHeldDescent) return;
+        if(Main.configFile.sneakHeldDescent) return;
         Vec3d playerVec = Main.mc.player.getPositionVector();
         BlockPos playerPosition = new BlockPos(playerVec.x, playerVec.y, playerVec.z);
         if (sneak.isPressed()) {
@@ -94,10 +93,10 @@ public class Phase {
     }
 
     private boolean isEnabled() {
-        if(Config.phaseWithKeybind) {
+        if(Main.configFile.phaseWithKeybind) {
             return Main.doPhase;
         } else {
-            return Config.phase;
+            return Main.configFile.phase;
         }
     }
 }

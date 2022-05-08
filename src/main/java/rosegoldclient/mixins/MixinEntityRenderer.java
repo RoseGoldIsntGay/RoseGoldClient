@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import rosegoldclient.Main;
 
 @Mixin(EntityRenderer.class)
-public abstract class MixinEntityRender {
+public abstract class MixinEntityRenderer {
 
     @Redirect(method="orientCamera", at=@At(value="INVOKE", target="Lnet/minecraft/util/math/Vec3d;distanceTo(Lnet/minecraft/util/math/Vec3d;)D"))
     public double onCamera(Vec3d instance, Vec3d vec) {

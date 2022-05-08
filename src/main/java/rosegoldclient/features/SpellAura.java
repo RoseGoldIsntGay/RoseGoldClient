@@ -12,11 +12,9 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import rosegoldclient.Main;
 import rosegoldclient.commands.SpellAuraFilter;
-import rosegoldclient.config.Config;
 import rosegoldclient.events.*;
 import rosegoldclient.utils.RenderUtils;
 import rosegoldclient.utils.RotationUtils;
-import rosegoldclient.utils.Utils;
 
 import java.awt.*;
 import java.util.*;
@@ -72,35 +70,35 @@ public class SpellAura {
         spellWasCast = false;
         index = 0;
         spellCycle.clear();
-        if (Config.spellOneType != 0) {
-            spellCycle.add(new Spell(Config.spellOneType, Config.spellOneDelay));
+        if (Main.configFile.spellOneType != 0) {
+            spellCycle.add(new Spell(Main.configFile.spellOneType, Main.configFile.spellOneDelay));
         }
-        if(Config.spellTwoType != 0) {
-            spellCycle.add(new Spell(Config.spellTwoType, Config.spellTwoDelay));
+        if(Main.configFile.spellTwoType != 0) {
+            spellCycle.add(new Spell(Main.configFile.spellTwoType, Main.configFile.spellTwoDelay));
         }
-        if(Config.spellThreeType != 0) {
-            spellCycle.add(new Spell(Config.spellThreeType, Config.spellThreeDelay));
+        if(Main.configFile.spellThreeType != 0) {
+            spellCycle.add(new Spell(Main.configFile.spellThreeType, Main.configFile.spellThreeDelay));
         }
-        if(Config.spellFourType != 0) {
-            spellCycle.add(new Spell(Config.spellFourType, Config.spellFourDelay));
+        if(Main.configFile.spellFourType != 0) {
+            spellCycle.add(new Spell(Main.configFile.spellFourType, Main.configFile.spellFourDelay));
         }
-        if(Config.spellFiveType != 0) {
-            spellCycle.add(new Spell(Config.spellFiveType, Config.spellFiveDelay));
+        if(Main.configFile.spellFiveType != 0) {
+            spellCycle.add(new Spell(Main.configFile.spellFiveType, Main.configFile.spellFiveDelay));
         }
-        if (Config.spellSixType != 0) {
-            spellCycle.add(new Spell(Config.spellSixType, Config.spellSixDelay));
+        if (Main.configFile.spellSixType != 0) {
+            spellCycle.add(new Spell(Main.configFile.spellSixType, Main.configFile.spellSixDelay));
         }
-        if(Config.spellSevenType != 0) {
-            spellCycle.add(new Spell(Config.spellSevenType, Config.spellSevenDelay));
+        if(Main.configFile.spellSevenType != 0) {
+            spellCycle.add(new Spell(Main.configFile.spellSevenType, Main.configFile.spellSevenDelay));
         }
-        if(Config.spellEightType != 0) {
-            spellCycle.add(new Spell(Config.spellEightType, Config.spellEightDelay));
+        if(Main.configFile.spellEightType != 0) {
+            spellCycle.add(new Spell(Main.configFile.spellEightType, Main.configFile.spellEightDelay));
         }
-        if(Config.spellNineType != 0) {
-            spellCycle.add(new Spell(Config.spellNineType, Config.spellNineDelay));
+        if(Main.configFile.spellNineType != 0) {
+            spellCycle.add(new Spell(Main.configFile.spellNineType, Main.configFile.spellNineDelay));
         }
-        if(Config.spellTenType != 0) {
-            spellCycle.add(new Spell(Config.spellTenType, Config.spellTenDelay));
+        if(Main.configFile.spellTenType != 0) {
+            spellCycle.add(new Spell(Main.configFile.spellTenType, Main.configFile.spellTenDelay));
         }
     }
 
@@ -110,7 +108,7 @@ public class SpellAura {
             target = null;
             return;
         }
-        if(!Config.spellAura || Main.mc.player == null || Main.mc.world == null) return;
+        if(!Main.configFile.spellAura || Main.mc.player == null || Main.mc.world == null) return;
         if(!spellWasCast) return;
         if(spellCycle.size() == 0) return;
         target = getEntity();
@@ -129,9 +127,9 @@ public class SpellAura {
 
     @SubscribeEvent(priority = EventPriority.NORMAL)
     public void onUpdatePre(PlayerMoveEvent.Pre pre) {
-        if(!Main.spellAura || !Config.spellAura || Main.mc.player == null || Main.mc.world == null) return;
+        if(!Main.spellAura || !Main.configFile.spellAura || Main.mc.player == null || Main.mc.world == null) return;
         if (target != null && currentSpell != null) {
-            switch (Config.spellAuraType) {
+            switch (Main.configFile.spellAuraType) {
                 case 1: //archer
                     RotationUtils.smoothLook(RotationUtils.getBowRotationToEntity(target), 0, () -> {});
                     break;
@@ -176,7 +174,7 @@ public class SpellAura {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onUpdatePost(PlayerMoveEvent.Post post) {
-        if(!Main.spellAura || !Config.spellAura || Main.mc.player == null || Main.mc.world == null) return;
+        if(!Main.spellAura || !Main.configFile.spellAura || Main.mc.player == null || Main.mc.world == null) return;
         if(target == null) return;
         if(spellWasCast) return;
         castSpell(currentSpell.spell);
@@ -186,7 +184,7 @@ public class SpellAura {
 
     @SubscribeEvent
     public void onRender(RenderWorldLastEvent event) {
-        if(!Config.highlightSA) return;
+        if(!Main.configFile.highlightSA) return;
         if(target == null) return;
         RenderUtils.drawEntityESP(target, Color.RED, event.getPartialTicks());
     }
@@ -199,7 +197,7 @@ public class SpellAura {
 
     private static EntityLivingBase getEntity() {
         if(Main.mc.currentScreen != null || Main.mc.world == null) return null;
-        float range = Config.spellAuraRange;
+        float range = Main.configFile.spellAuraRange;
 
         List<Entity> entityList = Main.mc.world.getLoadedEntityList().stream().filter(
                 entity -> entity instanceof EntityLivingBase
@@ -217,11 +215,11 @@ public class SpellAura {
     }
 
     private static boolean isValid(Entity entity, float range, boolean throughWalls) {
-        if(Config.spellAuraCustomNames && !entity.hasCustomName()) {
+        if(Main.configFile.spellAuraCustomNames && !entity.hasCustomName()) {
             return false;
         }
-        if(Config.spellAuraFilter) {
-            if(Config.spellAuraFilterBlacklist) {
+        if(Main.configFile.spellAuraFilter) {
+            if(Main.configFile.spellAuraFilterBlacklist) {
                 for (String search : SpellAuraFilter.SASettings) {
                     if (removeFormatting(entity.getCustomNameTag()).contains(search)) {
                         return false;

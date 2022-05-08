@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import rosegoldclient.config.Config;
+import rosegoldclient.Main;
 
 @Mixin(AbstractClientPlayer.class)
 public abstract class MixinAbstractClientPlayer extends EntityPlayer {
@@ -21,6 +21,6 @@ public abstract class MixinAbstractClientPlayer extends EntityPlayer {
 
     @Inject(method = "getLocationSkin()Lnet/minecraft/util/ResourceLocation;", at = @At("RETURN"), cancellable = true)
     public void replaceSkin(CallbackInfoReturnable<ResourceLocation> cir) {
-        if(Config.anon) cir.setReturnValue(DefaultPlayerSkin.getDefaultSkinLegacy());
+        if(Main.configFile.anon) cir.setReturnValue(DefaultPlayerSkin.getDefaultSkinLegacy());
     }
 }

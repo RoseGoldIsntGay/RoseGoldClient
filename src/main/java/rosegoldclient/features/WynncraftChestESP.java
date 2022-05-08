@@ -4,10 +4,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import rosegoldclient.Main;
-import rosegoldclient.config.Config;
+import rosegoldclient.events.SecondEvent;
 import rosegoldclient.events.SettingChangeEvent;
 import rosegoldclient.events.TickEndEvent;
 import rosegoldclient.utils.RenderUtils;
+import rosegoldclient.utils.Utils;
 
 import java.awt.*;
 import java.util.HashSet;
@@ -21,8 +22,8 @@ public class WynncraftChestESP {
     @SubscribeEvent
     public void onTick(TickEndEvent event) {
         if (Main.mc.player == null || Main.mc.world == null) return;
-        if (!Config.wynnChestESP) return;
-        if (Config.wynnChestESPRange == 0) {
+        if (!Main.configFile.wynnChestESP) return;
+        if (Main.configFile.wynnChestESPRange == 0) {
             toRender.clear();
             toRender.addAll(chests);
             return;
@@ -33,7 +34,7 @@ public class WynncraftChestESP {
             lastCheckedPosition = playerPosition;
             for(BlockPos blockPos : chests) {
                 double dist = blockPos.getDistance(playerPosition.getX(), playerPosition.getY(), playerPosition.getZ());
-                if(Config.wynnChestESPRange >= dist) {
+                if(Main.configFile.wynnChestESPRange >= dist) {
                     toRender.add(blockPos);
                 }
             }
@@ -41,15 +42,18 @@ public class WynncraftChestESP {
     }
 
     @SubscribeEvent
-    public void onSettingsChanges(SettingChangeEvent event) {
-        if (event.setting.name.equals("Wynncraft Chest ESP Range")) {
-            lastCheckedPosition = null;
-        }
+    public void onSettingChanged(SettingChangeEvent event) {
+        Utils.sendModMessage(event.setting);
+    }
+
+    @SubscribeEvent
+    public void onSecond(SecondEvent event) {
+        lastCheckedPosition = null;
     }
 
     @SubscribeEvent
     public void onRenderWorld(RenderWorldLastEvent event) {
-        if (!Config.wynnChestESP) return;
+        if (!Main.configFile.wynnChestESP) return;
         for (BlockPos block : toRender) {
             RenderUtils.drawBlockESP(block, new Color(255, 128, 0), event.getPartialTicks());
         }

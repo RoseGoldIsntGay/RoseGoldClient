@@ -6,9 +6,7 @@ import net.minecraft.network.play.server.SPacketPlayerPosLook;
 import net.minecraft.network.play.server.SPacketRespawn;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import rosegoldclient.Main;
-import rosegoldclient.config.Config;
 import rosegoldclient.events.PacketReceivedEvent;
-import rosegoldclient.utils.Utils;
 
 public class NoRotate {
 
@@ -17,7 +15,7 @@ public class NoRotate {
     @SubscribeEvent
     public void onPacket(PacketReceivedEvent event) {
         if(event.packet instanceof SPacketPlayerPosLook) {
-            if(!Config.noRotate || Main.mc.player == null) return;
+            if(!Main.configFile.noRotate || Main.mc.player == null) return;
             if(Main.mc.isIntegratedServerRunning()) return;
             event.setCanceled(true);
             EntityPlayerSP entityPlayer = Main.mc.player;

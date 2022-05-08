@@ -11,32 +11,32 @@ import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import rosegoldclient.Main;
-import rosegoldclient.config.Config;
 import rosegoldclient.events.*;
 import rosegoldclient.utils.RenderUtils;
 import rosegoldclient.utils.RotationUtils;
+import rosegoldclient.utils.Utils;
 
 import java.awt.*;
 import java.util.HashSet;
 
 public class ChestAura {
-    private static HashSet<BlockPos> allChests = new HashSet<>();
-    private static HashSet<BlockPos> chestsInRange = new HashSet<>();
+    private static final HashSet<BlockPos> allChests = new HashSet<>();
+    private static final HashSet<BlockPos> chestsInRange = new HashSet<>();
     private static BlockPos selectedBlock = null;
     private static BlockPos lastCheckedPosition = null;
-    private static HashSet<BlockPos> usedBlocks = new HashSet<>();
+    public static final HashSet<BlockPos> usedBlocks = new HashSet<>();
     private static int waitingForChestClose = 0;
 
     @SubscribeEvent
     public void chestESP(TickEndEvent event) {
         if (Main.mc.player == null || Main.mc.world == null) return;
-        if (!Config.chestAura) return;
-        if(!Config.chestESP) return;
+        if (!Main.configFile.chestAura) return;
+        if(!Main.configFile.chestESP) return;
         BlockPos playerPosition = Main.mc.player.getPosition();
         if ((lastCheckedPosition == null || !lastCheckedPosition.equals(playerPosition))) {
             allChests.clear();
             lastCheckedPosition = playerPosition;
-            int espRange = Config.chestESPRange;
+            int espRange = Main.configFile.chestESPRange;
             for (int x = playerPosition.getX() - espRange; x < playerPosition.getX() + espRange; x++) {
                 for (int y = playerPosition.getY() - espRange; y < playerPosition.getY() + espRange; y++) {
                     for (int z = playerPosition.getZ() - espRange; z < playerPosition.getZ() + espRange; z++) {
@@ -55,9 +55,9 @@ public class ChestAura {
     @SubscribeEvent
     public void chestsInRange(TickEndEvent event) {
         if (Main.mc.player == null || Main.mc.world == null) return;
-        if (!Config.chestAura) return;
+        if (!Main.configFile.chestAura) return;
         if(Main.mc.player.ticksExisted % 4 != 0) return;
-        int range = Config.chestAuraRange;
+        int range = Main.configFile.chestAuraRange;
         BlockPos playerPosition = Main.mc.player.getPosition();
         chestsInRange.clear();
         for (int x = playerPosition.getX() - range; x < playerPosition.getX() + range; x++) {
@@ -75,7 +75,7 @@ public class ChestAura {
         for (BlockPos chest : chestsInRange) {
             if (selectedBlock != null) return;
             if (!canOpenChest(chest)) continue;
-            switch (Config.chestAuraRangeType) {
+            switch (Main.configFile.chestAuraRangeType) {
                 case 1:
                     interactWithChest(chest);
                     usedBlocks.add(chest);
@@ -83,7 +83,7 @@ public class ChestAura {
                 case 0:
                     Vec3d playerPos = Main.mc.player.getPositionEyes(1f);
                     double distance = playerPos.distanceTo(new Vec3d(chest.getX() + 0.5, chest.getY() + 0.5, chest.getZ() + 0.5));
-                    if (distance < Config.chestAuraRange) {
+                    if (distance < Main.configFile.chestAuraRange) {
                         interactWithChest(chest);
                         usedBlocks.add(chest);
                     }
@@ -102,16 +102,10 @@ public class ChestAura {
     @SubscribeEvent
     public void onSecond(SecondEvent event) {
         if (Main.mc.player == null) return;
-        if (!Config.chestAura) return;
+        if (!Main.configFile.chestAura) return;
         if (Main.mc.currentScreen == null) {
             if(waitingForChestClose > 0) waitingForChestClose--;
             if(waitingForChestClose == 0) selectedBlock = null;
-        }
-    }
-
-    @SubscribeEvent
-    public void onSettingsChanges(SettingChangeEvent event) {
-        if (event.setting.name.equals("ESP Range")) {
             lastCheckedPosition = null;
         }
     }
@@ -119,21 +113,19 @@ public class ChestAura {
     @SubscribeEvent
     public void onScreenClosed(ScreenClosedEvent event) {
         selectedBlock = null;
+        waitingForChestClose = 0;
     }
 
     @SubscribeEvent
     public void onRenderWorld(RenderWorldLastEvent event) {
-        if (!Config.chestAura) return;
-        if (Config.chestESP) {
+        if (!Main.configFile.chestAura) return;
+        if (Main.configFile.chestESP) {
             for (BlockPos block : allChests) {
-                if (!usedBlocks.contains(block)) {
+                if(usedBlocks.contains(block)) {
+                    RenderUtils.drawBlockESP(block, Color.GREEN, event.getPartialTicks());
+                } else {
                     RenderUtils.drawBlockESP(block, new Color(255, 128, 0), event.getPartialTicks());
                 }
-            }
-        }
-        if (Config.openedChestESP) {
-            for (BlockPos block : usedBlocks) {
-                RenderUtils.drawBlockESP(block, Color.GREEN, event.getPartialTicks());
             }
         }
     }
@@ -148,7 +140,7 @@ public class ChestAura {
     }
 
     private static boolean canOpenChest(BlockPos blockPos) {
-        if(Config.onlyConfirmedChests) {
+        if(Main.configFile.onlyConfirmedChests) {
             return Main.mc.player.onGround && Main.mc.currentScreen == null && !usedBlocks.contains(blockPos) && WynncraftChestESP.chests.contains(blockPos);
         } else {
             return Main.mc.player.onGround && Main.mc.currentScreen == null && !usedBlocks.contains(blockPos);

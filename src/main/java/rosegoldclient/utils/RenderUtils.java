@@ -2,9 +2,13 @@ package rosegoldclient.utils;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
@@ -12,7 +16,6 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import org.lwjgl.opengl.GL11;
 import rosegoldclient.Main;
-import rosegoldclient.config.Config;
 
 import java.awt.*;
 import java.util.HashMap;
@@ -71,7 +74,7 @@ public class RenderUtils {
     private static final AxisAlignedBB DEFAULT_AABB = new AxisAlignedBB(0, 0, 0, 1, 1, 1);
 
     public static void drawEntityESP(Entity entity, Color color, float partialTicks) {
-        if(Config.silentMode) return;
+        if(Main.configFile.silentMode) return;
         final RenderManager renderManager = mc.getRenderManager();
 
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -88,17 +91,17 @@ public class RenderUtils {
 
         final AxisAlignedBB entityBox = entity.getEntityBoundingBox();
         final AxisAlignedBB axisAlignedBB = new AxisAlignedBB(
-                entityBox.minX - entity.posX + x - 0.05D,
+                entityBox.minX - entity.posX + x,
                 entityBox.minY - entity.posY + y,
-                entityBox.minZ - entity.posZ + z - 0.05D,
-                entityBox.maxX - entity.posX + x + 0.05D,
+                entityBox.minZ - entity.posZ + z,
+                entityBox.maxX - entity.posX + x,
                 entityBox.maxY - entity.posY + y + 0.15D,
-                entityBox.maxZ - entity.posZ + z + 0.05D
+                entityBox.maxZ - entity.posZ + z
         );
 
         glLineWidth((float) 3);
         enableGlCap(GL_LINE_SMOOTH);
-        glColor(color.getRed(), color.getGreen(), color.getBlue(), 95);
+        glColor(color.getRed(), color.getGreen(), color.getBlue(), 200);
         drawOutlinedBox(axisAlignedBB);
 
         glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
@@ -107,7 +110,7 @@ public class RenderUtils {
     }
 
     public static void drawBlockESP(BlockPos blockPos, Color color, float partialTicks) {
-        if(Config.silentMode) return;
+        if(Main.configFile.silentMode) return;
         final RenderManager renderManager = mc.getRenderManager();
 
         final double x = blockPos.getX() - renderManager.viewerPosX;
@@ -143,8 +146,88 @@ public class RenderUtils {
         resetCaps();
     }
 
-    public static void drawOutlinedBox() {
+    /**
+     * Modified from NotEnoughUpdates under Creative Commons Attribution-NonCommercial 3.0
+     * https://github.com/Moulberry/NotEnoughUpdates/blob/master/LICENSE
+     */
+    public static void renderWaypointText(String str, double X, double Y, double Z, float partialTicks) {
+        GlStateManager.alphaFunc(516, 0.1F);
 
+        GlStateManager.pushMatrix();
+
+        Entity viewer = Main.mc.getRenderViewEntity();
+        double viewerX = viewer.lastTickPosX + (viewer.posX - viewer.lastTickPosX) * partialTicks;
+        double viewerY = viewer.lastTickPosY + (viewer.posY - viewer.lastTickPosY) * partialTicks;
+        double viewerZ = viewer.lastTickPosZ + (viewer.posZ - viewer.lastTickPosZ) * partialTicks;
+
+        double x = X - viewerX;
+        double y = Y - viewerY - viewer.getEyeHeight();
+        double z = Z - viewerZ;
+
+        double distSq = x * x + y * y + z * z;
+        double dist = Math.sqrt(distSq);
+        if (distSq > 144) {
+            x *= 12 / dist;
+            y *= 12 / dist;
+            z *= 12 / dist;
+        }
+        GlStateManager.translate(x, y, z);
+        GlStateManager.translate(0, viewer.getEyeHeight(), 0);
+
+        drawNametag(str);
+
+        GlStateManager.rotate(-Main.mc.getRenderManager().playerViewY, 0.0F, 1.0F, 0.0F);
+        GlStateManager.rotate(Main.mc.getRenderManager().playerViewX, 1.0F, 0.0F, 0.0F);
+        GlStateManager.translate(0, -0.25f, 0);
+        GlStateManager.rotate(-Main.mc.getRenderManager().playerViewX, 1.0F, 0.0F, 0.0F);
+        GlStateManager.rotate(Main.mc.getRenderManager().playerViewY, 0.0F, 1.0F, 0.0F);
+
+        drawNametag("§e" + Math.round(dist) + " blocks");
+
+        GlStateManager.popMatrix();
+
+        GlStateManager.disableLighting();
+    }
+
+    public static void drawNametag(String str) {
+        FontRenderer fontrenderer = Main.mc.fontRenderer;
+        float f = 1.6F;
+        float f1 = 0.016666668F * f;
+        GlStateManager.pushMatrix();
+        GL11.glNormal3f(0.0F, 1.0F, 0.0F);
+        GlStateManager.rotate(-Main.mc.getRenderManager().playerViewY, 0.0F, 1.0F, 0.0F);
+        GlStateManager.rotate(Main.mc.getRenderManager().playerViewX, 1.0F, 0.0F, 0.0F);
+        GlStateManager.scale(-f1, -f1, f1);
+        GlStateManager.disableLighting();
+        GlStateManager.depthMask(false);
+        GlStateManager.disableDepth();
+        GlStateManager.enableBlend();
+        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder bufferBuilder = tessellator.getBuffer();
+        int i = 0;
+
+        int j = fontrenderer.getStringWidth(str) / 2;
+        GlStateManager.disableTexture2D();
+        bufferBuilder.begin(7, DefaultVertexFormats.POSITION_COLOR);
+        bufferBuilder.pos(-j - 1, -1 + i, 0.0D).color(0.0F, 0.0F, 0.0F, 0.25F).endVertex();
+        bufferBuilder.pos(-j - 1, 8 + i, 0.0D).color(0.0F, 0.0F, 0.0F, 0.25F).endVertex();
+        bufferBuilder.pos(j + 1, 8 + i, 0.0D).color(0.0F, 0.0F, 0.0F, 0.25F).endVertex();
+        bufferBuilder.pos(j + 1, -1 + i, 0.0D).color(0.0F, 0.0F, 0.0F, 0.25F).endVertex();
+        tessellator.draw();
+        GlStateManager.enableTexture2D();
+        fontrenderer.drawString(str, -fontrenderer.getStringWidth(str) / 2, i, 553648127);
+        GlStateManager.depthMask(true);
+
+        fontrenderer.drawString(str, -fontrenderer.getStringWidth(str) / 2, i, -1);
+
+        GlStateManager.enableDepth();
+        GlStateManager.enableBlend();
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.popMatrix();
+    }
+
+    public static void drawOutlinedBox() {
         drawOutlinedBox(DEFAULT_AABB);
     }
 

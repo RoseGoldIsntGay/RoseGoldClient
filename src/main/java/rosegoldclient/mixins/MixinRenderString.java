@@ -7,7 +7,6 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import rosegoldclient.Main;
-import rosegoldclient.config.Config;
 
 @Mixin(FontRenderer.class)
 public abstract class MixinRenderString {
@@ -57,14 +56,14 @@ public abstract class MixinRenderString {
 
     @ModifyVariable(method = "drawString(Ljava/lang/String;FFIZ)I", at = @At(value = "FIELD"))
     private String replace(String text) {
-        if (!Config.anon) return text;
+        if (!Main.configFile.anon) return text;
         return doNameThing(text);
     }
 
     private String doNameThing(String text) {
-        if(text.contains("Randomize Text") || text.contains("Randomize text")) return text;
-        if(Config.anon) {
-            if (Config.randomizeAnon) {
+        if(text.contains("Randomize Text") || text.contains("Randomize text") || text.contains("§bPowered by: §aRoseGoldClient")) return text;
+        if(Main.configFile.anon) {
+            if (Main.configFile.randomizeAnon) {
                 StringBuilder sb = new StringBuilder();
                 for (int i = 0; i < text.length(); i++) {
                     int index = Main.alphaNumeric.indexOf(String.valueOf(text.charAt(i)));

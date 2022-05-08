@@ -13,9 +13,11 @@
     "MixinBlock",
     "MixinEntityPlayerSP",
     "MixinEntityRender",
+    "MixinEntityRenderer",
     "MixinFMLHandShake",
     "MixinGuiDisconnected",
     "MixinNetworkManager",
+    "MixinRendererLivingEntity",
     "MixinRenderString"
   ],
   "minVersion": "0.8"

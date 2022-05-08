@@ -11,7 +11,6 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import rosegoldclient.Main;
 import rosegoldclient.commands.KillAuraFilter;
-import rosegoldclient.config.Config;
 import rosegoldclient.events.PlayerMoveEvent;
 import rosegoldclient.events.TickEndEvent;
 import rosegoldclient.utils.RenderUtils;
@@ -29,15 +28,15 @@ public class KillAura {
 
     @SubscribeEvent
     public void onTick(TickEndEvent event) {
-        if(!Main.killAura || !Config.killAura || Main.mc.player == null || Main.mc.world == null) return;
+        if(!Main.killAura || !Main.configFile.killAura || Main.mc.player == null || Main.mc.world == null) return;
         target = getEntity();
     }
 
     @SubscribeEvent(priority = EventPriority.NORMAL)
     public void onUpdatePre(PlayerMoveEvent.Pre pre) {
-        if(!Main.killAura || !Config.killAura || Main.mc.player == null || Main.mc.world == null) return;
+        if(!Main.killAura || !Main.configFile.killAura || Main.mc.player == null || Main.mc.world == null) return;
         if (target != null) {
-            if(Config.killAuraType == 1) {
+            if(Main.configFile.killAuraType == 1) {
                 RotationUtils.smoothLook(RotationUtils.getBowRotationToEntity(target), 0, () -> {});
             } else {
                 RotationUtils.smoothLook(RotationUtils.getRotationToEntity(target), 0, () -> {});
@@ -47,12 +46,12 @@ public class KillAura {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onUpdatePost(PlayerMoveEvent.Post post) {
-        if(!Main.killAura || !Config.killAura || Main.mc.player == null || Main.mc.world == null) return;
+        if(!Main.killAura || !Main.configFile.killAura || Main.mc.player == null || Main.mc.world == null) return;
         if(Main.mc.getConnection() == null) return;
         if(target == null) return;
         if(Main.mc.player.ticksExisted % 2 != 0) return;
         if(SpellCaster.packetList.size() != 0) return;
-        switch (Config.killAuraType) {
+        switch (Main.configFile.killAuraType) {
             case 0: //melee
                 Main.mc.player.swingArm(EnumHand.MAIN_HAND);
                 Main.mc.playerController.attackEntity(Main.mc.player, target);
@@ -67,7 +66,7 @@ public class KillAura {
 
     @SubscribeEvent
     public void renderWorld(RenderWorldLastEvent event) {
-        if(!Main.killAura || !Config.killAura || Main.mc.player == null || Main.mc.world == null || !Config.highlightKA) return;
+        if(!Main.killAura || !Main.configFile.killAura || Main.mc.player == null || Main.mc.world == null || !Main.configFile.highlightKA) return;
         if (target != null) {
             RenderUtils.drawEntityESP(target, Color.RED, event.getPartialTicks());
         }
@@ -77,7 +76,7 @@ public class KillAura {
         if(Main.mc.currentScreen != null || Main.mc.world == null) return null;
         float range = 4F;
         boolean throughWalls = true;
-        switch (Config.killAuraType) {
+        switch (Main.configFile.killAuraType) {
             case 1: //bow
                 range = 40F;
                 throughWalls = false;
@@ -109,11 +108,11 @@ public class KillAura {
     }
 
     private static boolean isValid(EntityLivingBase entity, float range, boolean throughWalls) {
-        if(Config.killAuraCustomNames && !entity.hasCustomName()) {
+        if(Main.configFile.killAuraCustomNames && !entity.hasCustomName()) {
             return false;
         }
-        if(Config.killAuraFilter) {
-            if(Config.killAuraFilterBlacklist) {
+        if(Main.configFile.killAuraFilter) {
+            if(Main.configFile.killAuraFilterBlacklist) {
                 for (String search : KillAuraFilter.KASettings) {
                     if (removeFormatting(entity.getCustomNameTag()).contains(search)) {
                         return false;

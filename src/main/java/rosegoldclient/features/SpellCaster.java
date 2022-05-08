@@ -9,7 +9,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
 import org.lwjgl.input.Keyboard;
 import rosegoldclient.Main;
-import rosegoldclient.config.Config;
 import rosegoldclient.events.TickEndEvent;
 
 import java.util.ArrayList;
@@ -25,7 +24,6 @@ public class SpellCaster {
 
     @SubscribeEvent
     public void onKey(InputEvent.KeyInputEvent event) {
-        if(!Config.instantSpellCast) return;
         if(Main.mc.player == null || Main.mc.world == null || Main.mc.getConnection() == null) return;
         int eventKey = Keyboard.getEventKey();
         if(!Keyboard.isKeyDown(eventKey)) return;
@@ -53,7 +51,7 @@ public class SpellCaster {
     public void onTick(TickEndEvent event) {
         totalTicks++;
         if(packetList.size() == 0) return;
-        if(totalTicks % (Config.spellCastSpeed + 2) != 0) return;
+        if(totalTicks % (Main.configFile.spellCastSpeed + 2) != 0) return;
         processPackets();
     }
 
