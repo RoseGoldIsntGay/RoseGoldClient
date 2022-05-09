@@ -34,7 +34,11 @@ public class KillAura {
 
     @SubscribeEvent(priority = EventPriority.NORMAL)
     public void onUpdatePre(PlayerMoveEvent.Pre pre) {
-        if(!Main.killAura || !Main.configFile.killAura || Main.mc.player == null || Main.mc.world == null) return;
+        if(!Main.killAura) {
+            target = null;
+            return;
+        }
+        if(!Main.configFile.killAura || Main.mc.player == null || Main.mc.world == null) return;
         if (target != null) {
             if(Main.configFile.killAuraType == 1) {
                 RotationUtils.smoothLook(RotationUtils.getBowRotationToEntity(target), 0, () -> {});

@@ -122,7 +122,7 @@ public class Config extends Vigilant {
     public int velocityZ = 1;
 
     @Property(type = PropertyType.SWITCH, name = "Inventory Walk", description = "Walk while inside inventories",
-            category = "Movement", subcategory = "Phase")
+            category = "Movement", subcategory = "Inventory Walk")
     public boolean invWalk = false;
 
     /*
