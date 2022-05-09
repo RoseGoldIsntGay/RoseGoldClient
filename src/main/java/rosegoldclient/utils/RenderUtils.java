@@ -227,6 +227,153 @@ public class RenderUtils {
         GlStateManager.popMatrix();
     }
 
+    public static void drawRoundRect(float left, float top, float right, float bottom, final float radius, final int color) {
+        left += radius;
+        right -= radius;
+        if (left < right) {
+            final float i = left;
+            left = right;
+            right = i;
+        }
+        if (top < bottom) {
+            final float j = top;
+            top = bottom;
+            bottom = j;
+        }
+        final float f3 = (color >> 24 & 0xFF) / 255.0f;
+        final float f4 = (color >> 16 & 0xFF) / 255.0f;
+        final float f5 = (color >> 8 & 0xFF) / 255.0f;
+        final float f6 = (color & 0xFF) / 255.0f;
+        final Tessellator tessellator = Tessellator.getInstance();
+        final BufferBuilder bufferBuilder = tessellator.getBuffer();
+        GlStateManager.enableBlend();
+        GlStateManager.disableTexture2D();
+        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
+        GlStateManager.color(f4, f5, f6, f3);
+        bufferBuilder.begin(7, DefaultVertexFormats.POSITION);
+        bufferBuilder.pos(left, bottom, 0.0).endVertex();
+        bufferBuilder.pos(right, bottom, 0.0).endVertex();
+        bufferBuilder.pos(right, top, 0.0).endVertex();
+        bufferBuilder.pos(left, top, 0.0).endVertex();
+        tessellator.draw();
+        bufferBuilder.begin(7, DefaultVertexFormats.POSITION);
+        bufferBuilder.pos(right - radius, top - radius, 0.0).endVertex();
+        bufferBuilder.pos(right, top - radius, 0.0).endVertex();
+        bufferBuilder.pos(right, bottom + radius, 0.0).endVertex();
+        bufferBuilder.pos(right - radius, bottom + radius, 0.0).endVertex();
+        tessellator.draw();
+        bufferBuilder.begin(7, DefaultVertexFormats.POSITION);
+        bufferBuilder.pos(left, top - radius, 0.0).endVertex();
+        bufferBuilder.pos(left + radius, top - radius, 0.0).endVertex();
+        bufferBuilder.pos(left + radius, bottom + radius, 0.0).endVertex();
+        bufferBuilder.pos(left, bottom + radius, 0.0).endVertex();
+        tessellator.draw();
+        drawArc(right, bottom + radius, radius, 180);
+        drawArc(left, bottom + radius, radius, 90);
+        drawArc(right, top - radius, radius, 270);
+        drawArc(left, top - radius, radius, 0);
+        GlStateManager.enableTexture2D();
+        GlStateManager.disableBlend();
+    }
+
+    public static void drawRoundRect2(float x, float y, float width, float height, final float radius, final int color) {
+        width += x;
+        x += radius;
+        width -= radius;
+        if (x < width) {
+            final float i = x;
+            x = width;
+            width = i;
+        }
+        height += y;
+        if (y < height) {
+            final float j = y;
+            y = height;
+            height = j;
+        }
+        final float f3 = (color >> 24 & 0xFF) / 255.0f;
+        final float f4 = (color >> 16 & 0xFF) / 255.0f;
+        final float f5 = (color >> 8 & 0xFF) / 255.0f;
+        final float f6 = (color & 0xFF) / 255.0f;
+        final Tessellator tessellator = Tessellator.getInstance();
+        final BufferBuilder bufferBuilder = tessellator.getBuffer();
+        GlStateManager.enableBlend();
+        GlStateManager.disableTexture2D();
+        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
+        GlStateManager.color(f4, f5, f6, f3);
+        bufferBuilder.begin(7, DefaultVertexFormats.POSITION);
+        bufferBuilder.pos(x, height, 0.0).endVertex();
+        bufferBuilder.pos(width, height, 0.0).endVertex();
+        bufferBuilder.pos(width, y, 0.0).endVertex();
+        bufferBuilder.pos(x, y, 0.0).endVertex();
+        tessellator.draw();
+        bufferBuilder.begin(7, DefaultVertexFormats.POSITION);
+        bufferBuilder.pos(width - radius, y - radius, 0.0).endVertex();
+        bufferBuilder.pos(width, y - radius, 0.0).endVertex();
+        bufferBuilder.pos(width, height + radius, 0.0).endVertex();
+        bufferBuilder.pos(width - radius, height + radius, 0.0).endVertex();
+        tessellator.draw();
+        bufferBuilder.begin(7, DefaultVertexFormats.POSITION);
+        bufferBuilder.pos(x, y - radius, 0.0).endVertex();
+        bufferBuilder.pos(x + radius, y - radius, 0.0).endVertex();
+        bufferBuilder.pos(x + radius, height + radius, 0.0).endVertex();
+        bufferBuilder.pos(x, height + radius, 0.0).endVertex();
+        tessellator.draw();
+        drawArc(width, height + radius, radius, 180);
+        drawArc(x, height + radius, radius, 90);
+        drawArc(width, y - radius, radius, 270);
+        drawArc(x, y - radius, radius, 0);
+        GlStateManager.enableTexture2D();
+        GlStateManager.disableBlend();
+    }
+
+    public static void drawArc(final float x, final float y, final float radius, final int angleStart) {
+        final Tessellator tessellator = Tessellator.getInstance();
+        final BufferBuilder bufferBuilder = tessellator.getBuffer();
+        bufferBuilder.begin(6, DefaultVertexFormats.POSITION);
+        GlStateManager.translate(x, y, 0.0);
+        bufferBuilder.pos(0.0, 0.0, 0.0).endVertex();
+        final int points = 21;
+        for (double i = 0.0; i < points; ++i) {
+            final double radians = Math.toRadians(i / points * 90.0 + angleStart);
+            bufferBuilder.pos(radius * Math.sin(radians), radius * Math.cos(radians), 0.0).endVertex();
+        }
+        tessellator.draw();
+        GlStateManager.translate(-x, -y, 0.0);
+    }
+
+    public static void drawRect(float left, float top, float right, float bottom, final int color) {
+        if (left < right) {
+            final float i = left;
+            left = right;
+            right = i;
+        }
+        if (top < bottom) {
+            final float j = top;
+            top = bottom;
+            bottom = j;
+        }
+        final float f3 = (color >> 24 & 0xFF) / 255.0f;
+        final float f4 = (color >> 16 & 0xFF) / 255.0f;
+        final float f5 = (color >> 8 & 0xFF) / 255.0f;
+        final float f6 = (color & 0xFF) / 255.0f;
+        final Tessellator tessellator = Tessellator.getInstance();
+        final BufferBuilder bufferBuilder = tessellator.getBuffer();
+        GlStateManager.enableBlend();
+        GlStateManager.disableTexture2D();
+        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
+        GlStateManager.color(f4, f5, f6, f3);
+        bufferBuilder.begin(7, DefaultVertexFormats.POSITION);
+        bufferBuilder.pos(left, bottom, 0.0).endVertex();
+        bufferBuilder.pos(right, bottom, 0.0).endVertex();
+        bufferBuilder.pos(right, top, 0.0).endVertex();
+        bufferBuilder.pos(left, top, 0.0).endVertex();
+        tessellator.draw();
+        GlStateManager.color(1.0f, 1.0f, 1.0f);
+        GlStateManager.enableTexture2D();
+        GlStateManager.disableBlend();
+    }
+
     public static void drawOutlinedBox() {
         drawOutlinedBox(DEFAULT_AABB);
     }

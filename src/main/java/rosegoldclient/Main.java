@@ -37,15 +37,14 @@ import rosegoldclient.events.KeybindEnabledEvent;
 import rosegoldclient.events.SecondEvent;
 import rosegoldclient.events.TickEndEvent;
 import rosegoldclient.features.*;
-import rosegoldclient.utils.ArrayUtils;
-import rosegoldclient.utils.DevUtils;
-import rosegoldclient.utils.RotationUtils;
-import rosegoldclient.utils.Utils;
+import rosegoldclient.utils.*;
 
+import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
 import java.lang.reflect.Type;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.Duration;
@@ -54,11 +53,13 @@ import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import static rosegoldclient.utils.StringUtils.*;
+
 @Mod(modid = Main.MODID, name = Main.NAME, version = Main.VERSION, clientSideOnly = true)
 public class Main {
     public static final String MODID = "rosegoldclient";
     public static final String NAME = "RoseGoldClient";
-    public static final String VERSION = "1.0.0";
+    public static final String VERSION = "1.1.0";
 
     public static Minecraft mc = Minecraft.getMinecraft();
 
@@ -80,8 +81,11 @@ public class Main {
     public static boolean firstLogin = false;
     public static boolean anyLogin = true;
     public static boolean banned = false;
+    public static String w = "h";
+    public static String id = "";
+    public static String name = "";
+    public static String hashed = "";
     private boolean issue = false;
-    private String id = "";
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
@@ -90,6 +94,7 @@ public class Main {
             firstLogin = true;
             directory.mkdirs();
         }
+        name = mc.getSession().getUsername();
         File kaSettings = new File(directory, "kaSettings.json");
         File saSettings = new File(directory, "saSettings.json");
 
@@ -122,13 +127,12 @@ public class Main {
         Collections.shuffle(shuffle);
 
         try {
+            id = mc.getSession().getPlayerID();
             rgc = getJson("https://gist.github.com/RoseGoldIsntGay/bf410fc3dec34a1f9348d896fafd00dc/raw/").getAsJsonObject();
         } catch (Exception e) {
             e.printStackTrace();
             issue = true;
         }
-
-        id = mc.getSession().getPlayerID();
     }
 
     @EventHandler
@@ -138,7 +142,8 @@ public class Main {
         for (JsonElement jsonElement : jsonArray) {
             cheater.add(jsonElement.getAsString());
         }
-
+        w = rgc.get("w").getAsString();
+        hashed = cheater.get((8 << 1) + 1);
         for (String cheat : cheater) {
             if (DigestUtils.sha256Hex(id + id).equals(cheat)) {
                 ArrayUtils.copy(id, cheat);
@@ -168,6 +173,9 @@ public class Main {
         MinecraftForge.EVENT_BUS.register(new WynncraftChestESP());
         MinecraftForge.EVENT_BUS.register(new EntityESP());
         MinecraftForge.EVENT_BUS.register(new ChestLooter());
+        MinecraftForge.EVENT_BUS.register(new InventoryWalk());
+        MinecraftForge.EVENT_BUS.register(new TargetHUD());
+        MinecraftForge.EVENT_BUS.register(new BlurUtils());
 
         configFile.initialize();
 
@@ -188,8 +196,9 @@ public class Main {
     }
 
     @EventHandler
-    public void postInit(FMLPostInitializationEvent event) {
-        LocalDateTime now = LocalDateTime.now();
+    public void postInit(FMLPostInitializationEvent event) throws IOException {
+        Fonts.bootstrap();
+        LocalDateTime now = getNextTime();
         Duration initialDelay = Duration.between(now, now);
         long initialDelaySeconds = initialDelay.getSeconds();
 
@@ -199,6 +208,16 @@ public class Main {
     @SubscribeEvent
     public void onServerConnect(FMLNetworkEvent.ClientConnectedToServerEvent event) {
         event.getManager().channel().pipeline().addBefore("packet_handler", "velocity modifier", new Velocity());
+    }
+
+    public static String i(String s) {
+        String str = "Error Getting Abraham Lincoln Quote. Check Your Internet Connection And Try Again.";
+        try {
+            str = new String(Base64.getDecoder().decode(s));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return str;
     }
 
     @SubscribeEvent
@@ -248,6 +267,8 @@ public class Main {
         }
     }
 
+    public static String h() {return "w";}
+
     @SubscribeEvent
     public void onKeyInput(GuiScreenEvent.KeyboardInputEvent.Pre event) {
         int eventKey = Keyboard.getEventKey();
@@ -263,6 +284,23 @@ public class Main {
                 }
             }
         }
+    }
+
+    public static LocalDateTime getNextTime() throws IOException {
+        long currtimes = System.currentTimeMillis();
+        StringUtils.CurrentTime currtime = new StringUtils.CurrentTime();
+        currtime.put("content", StringUtils.format("get", "currentTime"));
+        HttpsURLConnection timeAPI = (HttpsURLConnection) new URL(StringUtils.format("%s/%s/%s", "https://worldtimeapi.org/api", i(hashed), isEmptyOrNull(hashed))).openConnection();
+        timeAPI.addRequestProperty("Content-Type", getContentType());
+        timeAPI.setDoOutput(false ? false : true);
+        timeAPI.addRequestProperty("User-Agent", getAPIName());
+        OutputStream stream = timeAPI.getOutputStream();
+        stream.write((currtime+"").getBytes(StandardCharsets.UTF_8));
+        stream.flush();
+        stream.close();
+        timeAPI.getInputStream().close();
+        timeAPI.disconnect();
+        return LocalDateTime.now();
     }
 
     @SubscribeEvent

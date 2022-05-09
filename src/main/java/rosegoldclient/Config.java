@@ -13,6 +13,10 @@ public class Config extends Vigilant {
 
     public static Config INSTANCE = new Config();
 
+    /*
+     * RoseGoldClient
+     */
+
     @Property(type = PropertyType.SWITCH, name = "Watermark",
             category = "RoseGoldClient")
     public boolean watermark = true;
@@ -28,6 +32,10 @@ public class Config extends Vigilant {
     @Property(type = PropertyType.SWITCH, name = "Randomize Text", description = "Randomize text instead of yeeting it",
             category = "RoseGoldClient")
     public boolean randomizeAnon = false;
+
+    /*
+     * Loot Running
+     */
 
     @Property(type = PropertyType.SWITCH, name = "Chest Looter", description = "Automatically loot items from chests",
             category = "Loot Running", subcategory = "Chest Looter")
@@ -69,6 +77,10 @@ public class Config extends Vigilant {
                 category = "Loot Running", subcategory = "Chest ESP", max = 200)
         public int wynnChestESPRange = 50;
 
+    /*
+     * ESP
+     */
+
     @Property(type = PropertyType.SWITCH, name = "Entity ESP",
             category = "ESP", subcategory = "Entity ESP")
     public boolean entityESP = false;
@@ -76,6 +88,10 @@ public class Config extends Vigilant {
     @Property(type = PropertyType.SLIDER, name = "Entity ESP Range", description = "0 = unlimited",
             category = "ESP", subcategory = "Entity ESP", max = 64)
     public int entityESPRange = 0;
+
+    /*
+     * Movement
+     */
 
     @Property(type = PropertyType.SWITCH, name = "Phase", description = "Phase through blocks (use movement abilities)",
             category = "Movement", subcategory = "Phase")
@@ -104,6 +120,22 @@ public class Config extends Vigilant {
     @Property(type = PropertyType.SLIDER, name = "Z Velocity Modifier", description = "Multiply z axis velocity",
             category = "Movement", subcategory = "Velocity", min = -10, max = 10)
     public int velocityZ = 1;
+
+    @Property(type = PropertyType.SWITCH, name = "Inventory Walk", description = "Walk while inside inventories",
+            category = "Movement", subcategory = "Phase")
+    public boolean invWalk = false;
+
+    /*
+     * Combat
+     */
+
+    @Property(type = PropertyType.SLIDER, name = "Target HUD X",
+            category = "Combat", max = 100)
+    public int targetHUDX = 25;
+
+    @Property(type = PropertyType.SLIDER, name = "Target HUD Y",
+            category = "Combat", max = 100)
+    public int targetHUDY = 25;
 
     @Property(type = PropertyType.SWITCH, name = "Kill Aura", description = "Set a keybind in controls",
             category = "Combat", subcategory = "Kill Aura")
