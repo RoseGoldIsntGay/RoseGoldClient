@@ -24,4 +24,5 @@ run
 
 # Files from Forge MDK
 forge*changelog.txt
+forge*changelog_new.txt
 src/main/java/rosegoldclient/utils/StringUtils.java
