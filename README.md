@@ -1,3 +1,6 @@
+**IF YOU CRASH ON STARTUP BEFORE MINECRAFT LOADS:**
+https://www.curseforge.com/minecraft/mc-mods/mixin-0-7-0-8-compatibility/download/3045381
+
 # RoseGoldClient
 Cheater get spectated.
 
