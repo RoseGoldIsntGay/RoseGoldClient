@@ -2,9 +2,7 @@ package rosegoldclient;
 
 import gg.essential.vigilance.Vigilant;
 import gg.essential.vigilance.data.*;
-import net.minecraftforge.common.MinecraftForge;
 import org.jetbrains.annotations.NotNull;
-import rosegoldclient.events.SettingChangeEvent;
 
 import java.io.File;
 import java.util.Comparator;
@@ -32,6 +30,22 @@ public class Config extends Vigilant {
     @Property(type = PropertyType.SWITCH, name = "Randomize Text", description = "Randomize text instead of yeeting it",
             category = "RoseGoldClient")
     public boolean randomizeAnon = false;
+
+    /*
+     * Macros
+     */
+
+    @Property(type = PropertyType.SWITCH, name = "Auto Clicker", description = "Set keybind under controls",
+            category = "Macros", subcategory = "Auto Clicker")
+    public boolean autoClicker = false;
+
+    @Property(type = PropertyType.SELECTOR, name = "Auto Click Type",
+            category = "Macros", subcategory = "Auto Clicker", options = {"Right Click", "Left Click"})
+    public int autoClickerMode = 0;
+
+    @Property(type = PropertyType.SLIDER, name = "Auto Click Delay", description = "Set delay in milliseconds",
+            category = "Macros", subcategory = "Auto Clicker", min = 1, max = 1000)
+    public int autoClickerDelay = 500;
 
     /*
      * Loot Running
@@ -81,13 +95,53 @@ public class Config extends Vigilant {
      * ESP
      */
 
+    @Property(type = PropertyType.SLIDER, name = "Entity ESP Outline Alpha", description = "Set outline transparency for entity outline ESPs",
+            category = "ESP", subcategory = "ESP Settings", max = 255)
+    public int espEntityOutlineAlpha = 200;
+
+    @Property(type = PropertyType.SLIDER, name = "Entity ESP Box Alpha", description = "Set outline transparency for entity box ESPs",
+            category = "ESP", subcategory = "ESP Settings", max = 255)
+    public int espEntityBoxAlpha = 100;
+
+    @Property(type = PropertyType.SLIDER, name = "Block ESP Outline Alpha", description = "Set outline transparency for block outline ESPs",
+            category = "ESP", subcategory = "ESP Settings", max = 255)
+    public int espBlockOutlineAlpha = 200;
+
+    @Property(type = PropertyType.SLIDER, name = "Block ESP Box Alpha", description = "Set outline transparency for block box ESPs",
+            category = "ESP", subcategory = "ESP Settings", max = 255)
+    public int espBlockBoxAlpha = 0;
+
+    @Property(type = PropertyType.SLIDER, name = "Distance Accuracy", description = "How many decimals points to show when displaying distance",
+            category = "ESP", subcategory = "ESP Settings", max = 4)
+    public int nametagDistanceDecimalPoints = 0;
+
     @Property(type = PropertyType.SWITCH, name = "Entity ESP",
             category = "ESP", subcategory = "Entity ESP")
     public boolean entityESP = false;
 
-    @Property(type = PropertyType.SLIDER, name = "Entity ESP Range", description = "0 = unlimited",
-            category = "ESP", subcategory = "Entity ESP", max = 64)
-    public int entityESPRange = 0;
+        @Property(type = PropertyType.SLIDER, name = "Entity ESP Range", description = "0 = unlimited",
+                category = "ESP", subcategory = "Entity ESP", max = 64)
+        public int entityESPRange = 0;
+
+    @Property(type = PropertyType.SWITCH, name = "NPC ESP",
+            category = "ESP", subcategory = "NPC ESP")
+    public boolean NPCESP = false;
+
+    @Property(type = PropertyType.SWITCH, name = "Dropped Item ESP", description = "Highlight dropped items considered rare",
+            category = "ESP", subcategory = "Dropped Item ESP")
+    public boolean droppedItemESP = false;
+
+        @Property(type = PropertyType.SWITCH, name = "Highlight Legendaries",
+                category = "ESP", subcategory = "Dropped Item ESP")
+        public boolean droppedItemESPLegendaries = true;
+
+        @Property(type = PropertyType.SWITCH, name = "Highlight Fableds",
+                category = "ESP", subcategory = "Dropped Item ESP")
+        public boolean droppedItemESPFableds = true;
+
+        @Property(type = PropertyType.SWITCH, name = "Highlight Mythics", description = "Includes on-screen message and loud notification sound",
+                category = "ESP", subcategory = "Dropped Item ESP")
+        public boolean droppedItemESPMythics = true;
 
     /*
      * Movement
@@ -124,6 +178,26 @@ public class Config extends Vigilant {
     @Property(type = PropertyType.SWITCH, name = "Inventory Walk", description = "Walk while inside inventories",
             category = "Movement", subcategory = "Inventory Walk")
     public boolean invWalk = false;
+
+    @Property(type = PropertyType.SWITCH, name = "Cursor Teleport", description = "Hypixel Skyblock AOTE",
+            category = "Movement", subcategory = "Cursor Teleport")
+    public boolean cursorTeleport = false;
+
+        @Property(type = PropertyType.SLIDER, name = "Cursor Teleport Range",
+                category = "Movement", subcategory = "Cursor Teleport", max = 100)
+        public int cursorTeleportRange = 60;
+
+        @Property(type = PropertyType.SWITCH, name = "Show distance", description = "Show block distance",
+                category = "Movement", subcategory = "Cursor Teleport")
+        public boolean cursorTeleportShowDistance = false;
+
+        @Property(type = PropertyType.SELECTOR, name = "Held item type", description = "Select which items to hold to teleport",
+                category = "Movement", subcategory = "Cursor Teleport", options = {"Non Weapon", "Empty Hand"})
+        public int cursorTeleportEmptyHand = 0;
+
+        @Property(type = PropertyType.SELECTOR, name = "Reset Velocity", description = "Select what velocity type to reset after teleportation",
+                category = "Movement", subcategory = "Cursor Teleport", options = {"Neither", "Horizontal", "Vertical", "Both"})
+        public int cursorTeleportResetVelocity = 0;
 
     /*
      * Combat
@@ -273,14 +347,17 @@ public class Config extends Vigilant {
             category = "Combat", subcategory = "Spells", max = 200)
     public int spellTenDelay = 0;
 
-    public Config() {
-        super(new File("./config/rosegoldclient/config.toml"), "&aRoseGoldClient", new JVMAnnotationPropertyCollector(), new ConfigSorting());
-        initialize();
+    /*
+     * World
+     */
 
-        /*registerListener("chestESP", (newVal) -> {
-            System.out.println("Chest ESP value changed: " + newVal);
-            MinecraftForge.EVENT_BUS.post(new SettingChangeEvent("chestESP"));
-        });*/
+    @Property(type = PropertyType.SWITCH, name = "Entity Ghost Hand", description = "Interact with entities through walls",
+            category = "World", subcategory = "Entity Ghost Hand")
+    public boolean entityGhostHand = false;
+
+    public Config() {
+        super(new File("./config/rosegoldclient/config.toml"), "§aRoseGoldClient", new JVMAnnotationPropertyCollector(), new ConfigSorting());
+        initialize();
     }
 
     public static class ConfigSorting extends SortingBehavior {

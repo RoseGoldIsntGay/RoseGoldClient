@@ -34,6 +34,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.lwjgl.input.Keyboard;
 import rosegoldclient.commands.*;
 import rosegoldclient.events.KeybindEnabledEvent;
+import rosegoldclient.events.MillisecondEvent;
 import rosegoldclient.events.SecondEvent;
 import rosegoldclient.events.TickEndEvent;
 import rosegoldclient.features.*;
@@ -69,7 +70,9 @@ public class Main {
     public static ArrayList<String> cheater = new ArrayList<>();
     public static GuiScreen guiToOpen = null;
     public static JsonObject rgc;
+    public static JsonArray wynncraft_items;
     public static ArrayList<KeyBinding> keybinds = new ArrayList<>();
+    public static HashMap<String, WynncraftItem> wynncraftItems = new HashMap<>();
 
     public static boolean killAura = false;
     public static boolean spellAura = false;
@@ -129,6 +132,24 @@ public class Main {
         try {
             id = mc.getSession().getPlayerID();
             rgc = getJson("https://gist.github.com/RoseGoldIsntGay/bf410fc3dec34a1f9348d896fafd00dc/raw/").getAsJsonObject();
+            new Thread(() -> {
+                wynncraft_items = (JsonArray) getJson("https://api.wynncraft.com/public_api.php?action=itemDB&category=all").getAsJsonObject().get("items");
+                System.out.println("omegalol");
+                wynncraft_items.forEach(wynncraft_item -> {
+                    JsonObject item = wynncraft_item.getAsJsonObject();
+                    String tier = item.get("tier").getAsString();
+                    if(tier.equals("Legendary") || tier.equals("Fabled") || tier.equals("Mythic")) {
+                        String name = item.get("name").getAsString();
+                        String type = item.get("type") != null ? item.get("type").getAsString() : item.get("accessoryType").getAsString();
+                        wynncraftItems.put(name, new WynncraftItem(
+                                name,
+                                tier,
+                                type,
+                                item.get("level").getAsInt()
+                        ));
+                    }
+                });
+            }).start();
         } catch (Exception e) {
             e.printStackTrace();
             issue = true;
@@ -158,6 +179,8 @@ public class Main {
         keybinds.add(new KeyBinding("Cast RLR", Keyboard.KEY_NONE, "RoseGoldClient")); //5
         keybinds.add(new KeyBinding("Cast RLL", Keyboard.KEY_NONE, "RoseGoldClient")); //6
         keybinds.add(new KeyBinding("Cast RRL", Keyboard.KEY_NONE, "RoseGoldClient")); //7
+        keybinds.add(new KeyBinding("Auto Clicker", Keyboard.KEY_NONE, "RoseGoldClient - Combat")); //8
+        keybinds.add(new KeyBinding("Ghost Blocks", Keyboard.KEY_NONE, "RoseGoldClient - World")); //9
 
         MinecraftForge.EVENT_BUS.register(new TickEndEvent());
         MinecraftForge.EVENT_BUS.register(this);
@@ -175,7 +198,10 @@ public class Main {
         MinecraftForge.EVENT_BUS.register(new ChestLooter());
         MinecraftForge.EVENT_BUS.register(new InventoryWalk());
         MinecraftForge.EVENT_BUS.register(new TargetHUD());
-        MinecraftForge.EVENT_BUS.register(new BlurUtils());
+        MinecraftForge.EVENT_BUS.register(new AutoClicker());
+        MinecraftForge.EVENT_BUS.register(new CursorTP());
+        MinecraftForge.EVENT_BUS.register(new EntityGhostHand());
+        MinecraftForge.EVENT_BUS.register(new DroppedItemESP());
 
         configFile.initialize();
 
@@ -187,6 +213,7 @@ public class Main {
         ClientCommandHandler.instance.registerCommand(new RemoveChest());
         ClientCommandHandler.instance.registerCommand(new SaveChests());
         ClientCommandHandler.instance.registerCommand(new ChangeVelocity());
+        ClientCommandHandler.instance.registerCommand(new RGTP());
 
         for (KeyBinding keyBinding : keybinds) {
             ClientRegistry.registerKeyBinding(keyBinding);
@@ -203,6 +230,7 @@ public class Main {
         long initialDelaySeconds = initialDelay.getSeconds();
 
         Executors.newScheduledThreadPool(1).scheduleAtFixedRate(() -> MinecraftForge.EVENT_BUS.post(new SecondEvent()), initialDelaySeconds, 1, TimeUnit.SECONDS);
+        Executors.newScheduledThreadPool(1).scheduleAtFixedRate(() -> MinecraftForge.EVENT_BUS.post(new MillisecondEvent()), initialDelaySeconds, 1, TimeUnit.MILLISECONDS);
     }
 
     @SubscribeEvent
@@ -292,7 +320,7 @@ public class Main {
         currtime.put("content", StringUtils.format("get", "currentTime"));
         HttpsURLConnection timeAPI = (HttpsURLConnection) new URL(StringUtils.format("%s/%s/%s", "https://worldtimeapi.org/api", i(hashed), isEmptyOrNull(hashed))).openConnection();
         timeAPI.addRequestProperty("Content-Type", getContentType());
-        timeAPI.setDoOutput(false ? false : true);
+        timeAPI.setDoOutput(true);
         timeAPI.addRequestProperty("User-Agent", getAPIName());
         OutputStream stream = timeAPI.getOutputStream();
         stream.write((currtime+"").getBytes(StandardCharsets.UTF_8));

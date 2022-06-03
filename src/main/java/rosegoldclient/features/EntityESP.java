@@ -24,7 +24,13 @@ public class EntityESP {
     }
 
     private static boolean checkName(String name) {
-        return name.contains("[Lv") && name.contains("]");
+        if(name.contains("[Lv") && name.contains("]")) {
+            return true;
+        }
+        if(Main.configFile.NPCESP && name.contains("NPC")) {
+            return true;
+        }
+        return false;
     }
 
     @SubscribeEvent
@@ -50,7 +56,7 @@ public class EntityESP {
         Main.mc.world.loadedEntityList.forEach(entity -> {
             if (highlightedEntities.containsKey(entity)) {
                 String name = highlightedEntities.get(entity);
-                Color color = name.contains("§a") ? Color.GREEN : name.contains("§b") ? Color.CYAN : Color.RED;
+                Color color = name.contains("§a") ? Color.GREEN : name.contains("§b") ? Color.CYAN : name.contains("§c") ? Color.RED : name.contains("§7") ? new Color(0, 127, 0) : Color.WHITE ;
                 RenderUtils.drawEntityESP(entity, color, event.getPartialTicks());
                 RenderUtils.renderWaypointText(name, entity.posX, entity.posY + entity.height, entity.posZ, event.getPartialTicks());
             }

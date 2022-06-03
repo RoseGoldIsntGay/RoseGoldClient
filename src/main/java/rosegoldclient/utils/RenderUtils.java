@@ -74,6 +74,10 @@ public class RenderUtils {
     private static final AxisAlignedBB DEFAULT_AABB = new AxisAlignedBB(0, 0, 0, 1, 1, 1);
 
     public static void drawEntityESP(Entity entity, Color color, float partialTicks) {
+        drawEntityESP(entity, color, partialTicks, new AxisAlignedBB(0,0,0,0,0.15,0));
+    }
+
+    public static void drawEntityESP(Entity entity, Color color, float partialTicks, AxisAlignedBB inflate) {
         if(Main.configFile.silentMode) return;
         final RenderManager renderManager = mc.getRenderManager();
 
@@ -91,18 +95,22 @@ public class RenderUtils {
 
         final AxisAlignedBB entityBox = entity.getEntityBoundingBox();
         final AxisAlignedBB axisAlignedBB = new AxisAlignedBB(
-                entityBox.minX - entity.posX + x,
-                entityBox.minY - entity.posY + y,
-                entityBox.minZ - entity.posZ + z,
-                entityBox.maxX - entity.posX + x,
-                entityBox.maxY - entity.posY + y + 0.15D,
-                entityBox.maxZ - entity.posZ + z
+                entityBox.minX - entity.posX + x + inflate.minX,
+                entityBox.minY - entity.posY + y + inflate.minY,
+                entityBox.minZ - entity.posZ + z + inflate.minZ,
+                entityBox.maxX - entity.posX + x + inflate.maxX,
+                entityBox.maxY - entity.posY + y + inflate.maxY,
+                entityBox.maxZ - entity.posZ + z + inflate.maxZ
         );
 
         glLineWidth((float) 3);
         enableGlCap(GL_LINE_SMOOTH);
-        glColor(color.getRed(), color.getGreen(), color.getBlue(), 200);
+        glColor(color.getRed(), color.getGreen(), color.getBlue(), Main.configFile.espEntityOutlineAlpha);
         drawOutlinedBox(axisAlignedBB);
+
+        glColor(color.getRed(), color.getGreen(), color.getBlue(), Main.configFile.espEntityBoxAlpha);
+        drawSolidBox(axisAlignedBB);
+
 
         glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
         glDepthMask(true);
@@ -137,9 +145,11 @@ public class RenderUtils {
 
         glLineWidth((float) 3);
         enableGlCap(GL_LINE_SMOOTH);
-        glColor(color);
-
+        glColor(color.getRed(), color.getGreen(), color.getBlue(), Main.configFile.espBlockOutlineAlpha);
         drawOutlinedBox(axisAlignedBB);
+
+        glColor(color.getRed(), color.getGreen(), color.getBlue(), Main.configFile.espBlockBoxAlpha);
+        drawSolidBox(axisAlignedBB);
 
         GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
         glDepthMask(true);
@@ -151,6 +161,10 @@ public class RenderUtils {
      * https://github.com/Moulberry/NotEnoughUpdates/blob/master/LICENSE
      */
     public static void renderWaypointText(String str, double X, double Y, double Z, float partialTicks) {
+        renderWaypointText(str, X, Y, Z, partialTicks, true);
+    }
+
+    public static void renderWaypointText(String str, double X, double Y, double Z, float partialTicks, boolean showDist) {
         GlStateManager.alphaFunc(516, 0.1F);
 
         GlStateManager.pushMatrix();
@@ -182,7 +196,14 @@ public class RenderUtils {
         GlStateManager.rotate(-Main.mc.getRenderManager().playerViewX, 1.0F, 0.0F, 0.0F);
         GlStateManager.rotate(Main.mc.getRenderManager().playerViewY, 0.0F, 1.0F, 0.0F);
 
-        drawNametag("§e" + Math.round(dist) + " blocks");
+        if(showDist) {
+            if (Main.configFile.nametagDistanceDecimalPoints == 0) {
+                drawNametag("§e" + Math.round(dist) + " blocks");
+            } else {
+                double modifier = Math.pow(10, Main.configFile.nametagDistanceDecimalPoints);
+                drawNametag("§e" + Math.round(dist * modifier) / modifier + " blocks");
+            }
+        }
 
         GlStateManager.popMatrix();
 

@@ -105,7 +105,7 @@ public class ChestAura {
         if (!Main.configFile.chestAura) return;
         if (Main.mc.currentScreen == null) {
             if(waitingForChestClose > 0) waitingForChestClose--;
-            if(waitingForChestClose == 0) selectedBlock = null;
+            if(waitingForChestClose == 0) selectedBlock = null; CursorTP.disable = false;
             lastCheckedPosition = null;
         }
     }
@@ -113,6 +113,7 @@ public class ChestAura {
     @SubscribeEvent
     public void onScreenClosed(ScreenClosedEvent event) {
         selectedBlock = null;
+        CursorTP.disable = false;
         waitingForChestClose = 0;
     }
 
@@ -137,6 +138,7 @@ public class ChestAura {
         usedBlocks.clear();
         selectedBlock = null;
         lastCheckedPosition = null;
+        CursorTP.disable = false;
     }
 
     private static boolean canOpenChest(BlockPos blockPos) {
@@ -148,6 +150,7 @@ public class ChestAura {
     }
 
     private static void interactWithChest(BlockPos block) {
+        CursorTP.disable = true;
         waitingForChestClose = 1;
         selectedBlock = block;
         Main.mc.playerController.processRightClickBlock(

@@ -9,6 +9,7 @@ import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import rosegoldclient.Main;
+import rosegoldclient.utils.Utils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -22,14 +23,14 @@ public class ChestLooter {
 
     @SubscribeEvent
     public void onGuiOpen(GuiOpenEvent event) {
-        this.items.clear();
+        items.clear();
     }
 
     @SubscribeEvent
     public void onGuiDraw(GuiScreenEvent.BackgroundDrawnEvent event) {
         ContainerChest container;
         if (!Main.configFile.chestLoot || !(event.getGui() instanceof GuiChest)) return;
-        if (((GuiChest) event.getGui()).inventorySlots instanceof ContainerChest && (container = (ContainerChest) ((GuiChest) event.getGui()).inventorySlots).getLowerChestInventory().getDisplayName().getUnformattedText().startsWith("Loot Chest I")) {
+        if (((GuiChest) event.getGui()).inventorySlots instanceof ContainerChest && StringUtils.stripControlCodes((container = (ContainerChest) ((GuiChest) event.getGui()).inventorySlots).getLowerChestInventory().getDisplayName().getUnformattedText()).contains("Loot Chest I")) {
             if (items.isEmpty()) {
                 HashMap<Slot, Boolean> map = new HashMap<>();
                 List<Slot> chestSlots = container.inventorySlots.subList(0, 27);
@@ -40,8 +41,9 @@ public class ChestLooter {
                         map.put(slot, false);
                         continue;
                     }
-                    if(shiftClick.stream().noneMatch(itemName::contains)) continue;
-                    map.put(slot, true);
+                    if(shiftClick.stream().anyMatch(itemName::contains)) {
+                        map.put(slot, true);
+                    }
                 }
                 items.addAll(map.entrySet());
             } else if (System.currentTimeMillis() - lastClickTime > (long) Main.configFile.chestLootDelay) {
@@ -49,7 +51,8 @@ public class ChestLooter {
                         Main.mc.player.openContainer.windowId,
                         items.get(0).getKey().slotNumber,
                         0,
-                        items.get(0).getValue() ? ClickType.QUICK_MOVE : ClickType.PICKUP, Main.mc.player
+                        items.get(0).getValue() ? ClickType.QUICK_MOVE : ClickType.PICKUP,
+                        Main.mc.player
                 );
                 items.remove(0);
                 lastClickTime = System.currentTimeMillis();

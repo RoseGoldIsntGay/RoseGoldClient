@@ -35,14 +35,26 @@ public class ChangeVelocity extends CommandBase {
 
     @Override
     public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
-        if(args.length != 3) {
-            Utils.sendModMessage("&cInvalid arguments. Usage: " + getUsage(sender));
+        switch (args.length) {
+            case 0:
+                Utils.sendMessage(String.format("&aVelocity is %s %s %s", Main.configFile.velocityX, Main.configFile.velocityY, Main.configFile.velocityZ));
+                break;
+            case 1:
+                if(isInt(args[0])) Main.configFile.velocityY = Integer.parseInt(args[0]);
+                Utils.sendMessage(String.format("&aVelocity is now %s %s %s", Main.configFile.velocityX, Main.configFile.velocityY, Main.configFile.velocityZ));
+                break;
+            case 2:
+                if(isInt(args[0])) Main.configFile.velocityX = Integer.parseInt(args[0]);
+                if(isInt(args[1])) Main.configFile.velocityZ = Integer.parseInt(args[1]);
+                Utils.sendMessage(String.format("&aVelocity is now %s %s %s", Main.configFile.velocityX, Main.configFile.velocityY, Main.configFile.velocityZ));
+                break;
+            case 3:
+                if(isInt(args[0])) Main.configFile.velocityX = Integer.parseInt(args[0]);
+                if(isInt(args[1])) Main.configFile.velocityY = Integer.parseInt(args[1]);
+                if(isInt(args[2])) Main.configFile.velocityZ = Integer.parseInt(args[2]);
+                Utils.sendMessage(String.format("&aVelocity is now %s %s %s", Main.configFile.velocityX, Main.configFile.velocityY, Main.configFile.velocityZ));
+                break;
         }
-        if(isInt(args[0])) Main.configFile.velocityX = Integer.parseInt(args[0]);
-        if(isInt(args[1])) Main.configFile.velocityY = Integer.parseInt(args[1]);
-        if(isInt(args[2])) Main.configFile.velocityZ = Integer.parseInt(args[2]);
-
-        Utils.sendMessage(String.format("&aVelocity is now %s %s %s", Main.configFile.velocityX, Main.configFile.velocityY, Main.configFile.velocityZ));
     }
 
     private boolean isInt(String str) {
