@@ -6,6 +6,14 @@ Cheater get spectated.
 
 ### Current Feature List:
 
+<details><summary>Auto Clicker</summary>
+  
+- Works both in a GUI and outside
+- Left click and right click modes
+- Customizable speed
+- Clicks while key held
+</details>
+
 <details><summary>Chest Aura</summary>
   
 - Automatically opens nearby chests
@@ -19,12 +27,32 @@ Cheater get spectated.
 - Configurable speed
 </details>
 
+<details><summary>Cursor Teleport</summary>
+
+- Teleport to the block you are looking it
+- Works upwards through blocks, but not downwards or horizontally
+- I hate carpets, and you will too
+- Configurable Range
+</details>
+
+<details><summary>Dropped Item ESP</summary>
+
+- Highlight dropped items
+- Configurable rarities
+- Mythic notifications (troll your friends by dropping them mythics)
+</details>
+
 <details><summary>Entity ESP</summary>
 
 - Highlight wynncraft entities
 - 🌈 Colorful 🌈
 - Nametag and distance
 - Configurable range
+</details>
+
+<details><summary>Entity Ghost Hand</summary>
+
+- Interact with entities through walls
 </details>
 
 <details><summary>Kill Aura</summary>
