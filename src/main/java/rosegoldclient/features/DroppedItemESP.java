@@ -76,10 +76,12 @@ public class DroppedItemESP {
 
     private static WynncraftItem checkName(String name) {
         WynncraftItem wynncraftItem = Main.wynncraftItems.get(name);
-        if(Main.configFile.droppedItemESPLegendaries && wynncraftItem.getTier().equals("Legendary") ||
-                Main.configFile.droppedItemESPFableds && wynncraftItem.getTier().equals("Fabled") ||
-                Main.configFile.droppedItemESPMythics && wynncraftItem.getTier().equals("Mythic")) {
-            return wynncraftItem;
+        if(wynncraftItem != null) {
+            if (Main.configFile.droppedItemESPLegendaries && wynncraftItem.getTier().equals("Legendary") ||
+                    Main.configFile.droppedItemESPFableds && wynncraftItem.getTier().equals("Fabled") ||
+                    Main.configFile.droppedItemESPMythics && wynncraftItem.getTier().equals("Mythic")) {
+                return wynncraftItem;
+            }
         }
 
         return null;

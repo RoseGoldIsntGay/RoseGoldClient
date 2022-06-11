@@ -1,28 +1,35 @@
 package rosegoldclient.features;
 
+import gg.essential.api.utils.Multithreading;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.*;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import rosegoldclient.Main;
 import rosegoldclient.events.TickEndEvent;
 import rosegoldclient.utils.RenderUtils;
+import rosegoldclient.utils.Utils;
+import rosegoldclient.utils.VecUtils;
+import rosegoldclient.utils.pathfinding.Pathfinder;
 
 import javax.annotation.Nullable;
 import java.awt.*;
-import java.util.ArrayList;
 
 public class CursorTP {
     private static BlockPos blockToTeleport;
     private static Block b;
     public static boolean disable = false;
 
-    @SubscribeEvent
+    private static final KeyBinding sneak = Main.mc.gameSettings.keyBindSneak;
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onInteract(PlayerInteractEvent event) {
         if (!Main.configFile.cursorTeleport) return;
         if (cantUseItem()) return;
@@ -31,7 +38,30 @@ public class CursorTP {
                 event instanceof PlayerInteractEvent.RightClickEmpty ||
                 event instanceof PlayerInteractEvent.RightClickItem) {
             if (blockToTeleport != null) {
-                tpToBlock(blockToTeleport);
+                if(Main.configFile.cursorTeleportCancelClick) {
+                    ItemStack itemStack = Main.mc.player.getHeldItemMainhand();
+                    if (itemStack.getTagCompound() != null && !(itemStack.getTagCompound().hasNoTags())) {
+                        String nbt = itemStack.getTagCompound().toString();
+                        if (nbt.contains("§a✔§7 Class Req:")) {
+                            event.setCanceled(true);
+                        }
+                    }
+                }
+                switch (Main.configFile.cursorTeleportPathfind) {
+                    case 0:
+                        if(sneak.isKeyDown()) {
+                            pathfindToBlock(blockToTeleport);
+                        } else {
+                            tpToBlock(blockToTeleport);
+                        }
+                        break;
+                    case 1:
+                        pathfindToBlock(blockToTeleport);
+                        break;
+                    case 2:
+                        tpToBlock(blockToTeleport);
+                        break;
+                }
                 blockToTeleport = null;
             }
         }
@@ -63,6 +93,12 @@ public class CursorTP {
         }
     }
 
+    private static void pathfindToBlock(BlockPos blockPos) {
+        Multithreading.runAsync(() -> {
+            Pathfinder.setup(new BlockPos(VecUtils.floorVec(Main.mc.player.getPositionVector())), blockPos, 0);
+        });
+    }
+
     private static void tpToBlock(BlockPos blockPos) {
         Main.mc.player.setPosition(blockPos.getX() + 0.5, blockPos.getY() + 1, blockPos.getZ() + 0.5);
         switch (Main.configFile.cursorTeleportResetVelocity) {
@@ -84,8 +120,9 @@ public class CursorTP {
                 return nbt.contains("§a✔§7 Class Req:");
             case 1:
                 return !Main.mc.player.getHeldItemMainhand().isEmpty();
+            default:
+                return false;
         }
-        return false;
     }
 
     public RayTraceResult rayTrace(double blockReachDistance, float partialTicks) {
@@ -198,8 +235,15 @@ public class CursorTP {
 
                     if (!ignoreBlockWithoutBoundingBox || iblockstate1.getMaterial() == Material.PORTAL /*|| iblockstate1.getCollisionBoundingBox(Main.mc.world, blockpos) != Block.NULL_AABB*/) {
                         if (block1.canCollideCheck(iblockstate1, stopOnLiquid)) {
-                            if (Main.mc.world.getBlockState(blockpos.add(0, 1, 0)).getMaterial() == Material.AIR &&
-                                    Main.mc.world.getBlockState(blockpos.add(0, 2, 0)).getMaterial() == Material.AIR) {
+                            if(!sneak.isKeyDown()) {
+                                if (Main.mc.world.getBlockState(blockpos.add(0, 1, 0)).getMaterial() == Material.AIR &&
+                                        Main.mc.world.getBlockState(blockpos.add(0, 2, 0)).getMaterial() == Material.AIR) {
+                                    RayTraceResult raytraceresult1 = iblockstate1.collisionRayTrace(Main.mc.world, blockpos, playerEyesPos, playerTargetEyes);
+                                    if (raytraceresult1 != null) {
+                                        return raytraceresult1;
+                                    }
+                                }
+                            } else {
                                 RayTraceResult raytraceresult1 = iblockstate1.collisionRayTrace(Main.mc.world, blockpos, playerEyesPos, playerTargetEyes);
                                 if (raytraceresult1 != null) {
                                     return raytraceresult1;

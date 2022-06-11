@@ -147,6 +147,14 @@ public class Config extends Vigilant {
      * Movement
      */
 
+    @Property(type = PropertyType.SLIDER, name = "Pathfinding Unstuck time", description = "",
+            category = "Movement", subcategory = "Pathfinding", min = 1, max = 10)
+    public int pathfindingUnstuckTime = 3;
+
+    @Property(type = PropertyType.SLIDER, name = "Pathfinding Look time", description = "",
+            category = "Movement", subcategory = "Pathfinding", max = 1000)
+    public int pathfindingLookTime = 150;
+
     @Property(type = PropertyType.SWITCH, name = "Phase", description = "Phase through blocks (use movement abilities)",
             category = "Movement", subcategory = "Phase")
     public boolean phase = false;
@@ -179,9 +187,21 @@ public class Config extends Vigilant {
             category = "Movement", subcategory = "Inventory Walk")
     public boolean invWalk = false;
 
+    @Property(type = PropertyType.SWITCH, name = "No Fall", description = "Cancel all fall damage",
+            category = "Movement", subcategory = "No Fall")
+    public boolean noFall = false;
+
     @Property(type = PropertyType.SWITCH, name = "Cursor Teleport", description = "Hypixel Skyblock AOTE",
             category = "Movement", subcategory = "Cursor Teleport")
     public boolean cursorTeleport = false;
+
+        @Property(type = PropertyType.SELECTOR, name = "Pathfind", description = "Pathfind to destination",
+                category = "Movement", subcategory = "Cursor Teleport", options = {"While sneak held", "Always", "Never"})
+        public int cursorTeleportPathfind = 0;
+
+        @Property(type = PropertyType.SLIDER, name = "Pathfind Movement Speed", description = "Teleports per second",
+                category = "Movement", subcategory = "Cursor Teleport", min = 1, max = 100)
+        public int cursorTeleportPathfindSpeed = 1;
 
         @Property(type = PropertyType.SLIDER, name = "Cursor Teleport Range",
                 category = "Movement", subcategory = "Cursor Teleport", max = 100)
@@ -191,8 +211,12 @@ public class Config extends Vigilant {
                 category = "Movement", subcategory = "Cursor Teleport")
         public boolean cursorTeleportShowDistance = false;
 
+        @Property(type = PropertyType.SWITCH, name = "Cancel Right Click", description = "Cancel weapon uses",
+                category = "Movement", subcategory = "Cursor Teleport")
+        public boolean cursorTeleportCancelClick = false;
+
         @Property(type = PropertyType.SELECTOR, name = "Held item type", description = "Select which items to hold to teleport",
-                category = "Movement", subcategory = "Cursor Teleport", options = {"Non Weapon", "Empty Hand"})
+                category = "Movement", subcategory = "Cursor Teleport", options = {"Non Weapon", "Empty Hand", "Any"})
         public int cursorTeleportEmptyHand = 0;
 
         @Property(type = PropertyType.SELECTOR, name = "Reset Velocity", description = "Select what velocity type to reset after teleportation",

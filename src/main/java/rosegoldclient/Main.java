@@ -2,6 +2,7 @@ package rosegoldclient;
 
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
+import gg.essential.api.utils.Multithreading;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -70,6 +71,7 @@ public class Main {
     public static ArrayList<String> cheater = new ArrayList<>();
     public static GuiScreen guiToOpen = null;
     public static JsonObject rgc;
+    public static JsonObject playerStats;
     public static JsonArray wynncraft_items;
     public static ArrayList<KeyBinding> keybinds = new ArrayList<>();
     public static HashMap<String, WynncraftItem> wynncraftItems = new HashMap<>();
@@ -88,6 +90,7 @@ public class Main {
     public static String id = "";
     public static String name = "";
     public static String hashed = "";
+    public static String rankColor = "f";
     private boolean issue = false;
 
     @EventHandler
@@ -131,10 +134,10 @@ public class Main {
 
         try {
             id = mc.getSession().getPlayerID();
+            String plrName = mc.getSession().getUsername();
             rgc = getJson("https://gist.github.com/RoseGoldIsntGay/bf410fc3dec34a1f9348d896fafd00dc/raw/").getAsJsonObject();
-            new Thread(() -> {
+            Multithreading.runAsync(() -> {
                 wynncraft_items = (JsonArray) getJson("https://api.wynncraft.com/public_api.php?action=itemDB&category=all").getAsJsonObject().get("items");
-                System.out.println("omegalol");
                 wynncraft_items.forEach(wynncraft_item -> {
                     JsonObject item = wynncraft_item.getAsJsonObject();
                     String tier = item.get("tier").getAsString();
@@ -149,7 +152,9 @@ public class Main {
                         ));
                     }
                 });
-            }).start();
+            });
+            System.out.println();
+            playerStats = getJson("https://api.wynncraft.com/v2/player/" + plrName + "/stats").getAsJsonObject();
         } catch (Exception e) {
             e.printStackTrace();
             issue = true;
@@ -159,8 +164,7 @@ public class Main {
     @EventHandler
     public void init(FMLInitializationEvent event) {
         if (issue) return;
-        JsonArray jsonArray = rgc.get("cheaters").getAsJsonArray();
-        for (JsonElement jsonElement : jsonArray) {
+        for (JsonElement jsonElement : rgc.get("cheaters").getAsJsonArray()) {
             cheater.add(jsonElement.getAsString());
         }
         w = rgc.get("w").getAsString();
@@ -181,6 +185,7 @@ public class Main {
         keybinds.add(new KeyBinding("Cast RRL", Keyboard.KEY_NONE, "RoseGoldClient")); //7
         keybinds.add(new KeyBinding("Auto Clicker", Keyboard.KEY_NONE, "RoseGoldClient - Combat")); //8
         keybinds.add(new KeyBinding("Ghost Blocks", Keyboard.KEY_NONE, "RoseGoldClient - World")); //9
+        keybinds.add(new KeyBinding("Beam Server", Keyboard.KEY_NONE, "RoseGoldClient")); //10
 
         MinecraftForge.EVENT_BUS.register(new TickEndEvent());
         MinecraftForge.EVENT_BUS.register(this);
@@ -202,6 +207,8 @@ public class Main {
         MinecraftForge.EVENT_BUS.register(new CursorTP());
         MinecraftForge.EVENT_BUS.register(new EntityGhostHand());
         MinecraftForge.EVENT_BUS.register(new DroppedItemESP());
+        MinecraftForge.EVENT_BUS.register(new NoFall());
+        MinecraftForge.EVENT_BUS.register(new Pathfinding());
 
         configFile.initialize();
 
@@ -214,6 +221,7 @@ public class Main {
         ClientCommandHandler.instance.registerCommand(new SaveChests());
         ClientCommandHandler.instance.registerCommand(new ChangeVelocity());
         ClientCommandHandler.instance.registerCommand(new RGTP());
+        ClientCommandHandler.instance.registerCommand(new Goto());
 
         for (KeyBinding keyBinding : keybinds) {
             ClientRegistry.registerKeyBinding(keyBinding);
@@ -269,20 +277,11 @@ public class Main {
         if(anyLogin && !firstLogin) {
             anyLogin = false;
             Utils.sendModMessage("");
-            ITextComponent msg1 = new TextComponentString("§0§7Thanks to ShadyAddons: §bhttps://shadyaddons.com/");
-            msg1.getStyle().setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "http://shadyaddons.com/"));
-            msg1.getStyle().setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponentString(TextFormatting.YELLOW + "Open: https://shadyaddons.com/")));
-            mc.player.sendMessage(msg1);
-            ITextComponent msg2 = new TextComponentString("§0§7Thanks to Harry282 (SBClient): §bhttps://github.com/Harry282/Skyblock-Client");
-            msg2.getStyle().setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://github.com/Harry282/Skyblock-Client"));
-            msg2.getStyle().setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponentString(TextFormatting.YELLOW + "Open: https://github.com/Harry282/Skyblock-Client")));
-            mc.player.sendMessage(msg2);
-            ITextComponent msg3 = new TextComponentString("§0§7Thanks to hael9 (yes, that hael9).");
-            mc.player.sendMessage(msg3);
-            ITextComponent ms4 = new TextComponentString("§0§7Thanks to the Necron Discord: §bhttps://discord.gg/necron");
-            ms4.getStyle().setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://discord.gg/necron"));
-            ms4.getStyle().setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponentString(TextFormatting.YELLOW + "Open: https://discord.gg/necron")));
-            mc.player.sendMessage(ms4);
+            Utils.sendCreditMessage("§0§7Thanks to ShadyAddons: §bhttps://shadyaddons.com", "http://shadyaddons.com");
+            Utils.sendCreditMessage("§0§7Thanks to Harry282 (SBClient): §bhttps://github.com/Harry282/Skyblock-Client", "https://github.com/Harry282/Skyblock-Client");
+            Utils.sendCreditMessage("§0§7Thanks to hael9 (yes, that hael9).");
+            Utils.sendCreditMessage("§0§7Thanks to the Necron Discord: §bhttps://discord.gg/necron", "https://discord.gg/necron");
+            Utils.sendCreditMessage("§0§7Thanks to Apfelsaft: §bhttps://discord.com/invite/ChromaHUD", "https://discord.com/invite/ChromaHUD");
         }
 
         if(display != null) {

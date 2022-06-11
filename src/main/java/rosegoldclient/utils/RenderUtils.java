@@ -14,11 +14,14 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import org.lwjgl.opengl.GL11;
 import rosegoldclient.Main;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -117,6 +120,10 @@ public class RenderUtils {
         resetCaps();
     }
 
+    public static void drawBlockESP(BlockPos blockPos, int color, float partialTicks) {
+        drawBlockESP(blockPos, new Color((color >> 24 & 0xFF) / 255.0f, (color >> 16 & 0xFF) / 255.0f, (color >> 8 & 0xFF) / 255.0f), partialTicks);
+    }
+
     public static void drawBlockESP(BlockPos blockPos, Color color, float partialTicks) {
         if(Main.configFile.silentMode) return;
         final RenderManager renderManager = mc.getRenderManager();
@@ -154,6 +161,75 @@ public class RenderUtils {
         GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
         glDepthMask(true);
         resetCaps();
+    }
+
+    public static void drawLine(final Vec3d start, final Vec3d end, final float thickness, final float partialTicks) {
+        final Entity render = Minecraft.getMinecraft().getRenderViewEntity();
+        final BufferBuilder worldRenderer = Tessellator.getInstance().getBuffer();
+
+        final double realX = render.lastTickPosX + (render.posX - render.lastTickPosX) * partialTicks;
+        final double realY = render.lastTickPosY + (render.posY - render.lastTickPosY) * partialTicks;
+        final double realZ = render.lastTickPosZ + (render.posZ - render.lastTickPosZ) * partialTicks;
+
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(-realX, -realY, -realZ);
+        GlStateManager.disableTexture2D();
+        GlStateManager.disableLighting();
+        GL11.glDisable(3553);
+        GlStateManager.enableBlend();
+        GlStateManager.disableAlpha();
+        GL11.glLineWidth(thickness);
+        GlStateManager.disableDepth();
+        GlStateManager.depthMask(false);
+        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
+        GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
+        worldRenderer.begin(1, DefaultVertexFormats.POSITION_COLOR);
+        worldRenderer.pos(start.x, start.y, start.z).color(1.0f, 0.65f, 0.0f, 1.0f).endVertex();
+        worldRenderer.pos(end.x, end.y, end.z).color(1.0f, 0.65f, 0.0f, 1.0f).endVertex();
+        Tessellator.getInstance().draw();
+        GlStateManager.translate(realX, realY, realZ);
+        GlStateManager.disableBlend();
+        GlStateManager.enableAlpha();
+        GlStateManager.enableTexture2D();
+        GlStateManager.enableDepth();
+        GlStateManager.depthMask(true);
+        GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
+        GlStateManager.popMatrix();
+    }
+
+    public static void drawLines(ArrayList<Vec3d> poses, final float thickness, final float partialTicks) {
+        final Entity render = Minecraft.getMinecraft().getRenderViewEntity();
+        final BufferBuilder worldRenderer = Tessellator.getInstance().getBuffer();
+        final double realX = render.lastTickPosX + (render.posX - render.lastTickPosX) * partialTicks;
+        final double realY = render.lastTickPosY + (render.posY - render.lastTickPosY) * partialTicks;
+        final double realZ = render.lastTickPosZ + (render.posZ - render.lastTickPosZ) * partialTicks;
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(-realX, -realY, -realZ);
+        GlStateManager.disableTexture2D();
+        GlStateManager.disableLighting();
+        GL11.glDisable(3553);
+        GlStateManager.enableBlend();
+        GlStateManager.disableAlpha();
+        GL11.glLineWidth(thickness);
+        GlStateManager.disableDepth();
+        GlStateManager.depthMask(false);
+        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
+        GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
+        worldRenderer.begin(3, DefaultVertexFormats.POSITION_COLOR);
+        int num = 0;
+        for (final Vec3d pos : poses) {
+            final int i = ColorUtils.getChroma(2500.0f, num++ * 5);
+            worldRenderer.pos(pos.x + 0.5, pos.y + 0.5, pos.z + 0.5).color((i >> 16 & 0xFF) / 255.0f, (i >> 8 & 0xFF) / 255.0f, (i & 0xFF) / 255.0f, (i >> 24 & 0xFF) / 255.0f).endVertex();
+        }
+        Tessellator.getInstance().draw();
+        GlStateManager.translate(realX, realY, realZ);
+        GlStateManager.disableBlend();
+        GlStateManager.enableAlpha();
+        GlStateManager.enableTexture2D();
+        GlStateManager.enableDepth();
+        GlStateManager.depthMask(true);
+        GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
+        GlStateManager.popMatrix();
     }
 
     /**
