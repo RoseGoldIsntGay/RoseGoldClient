@@ -1,5 +1,9 @@
 package rosegoldclient.features;
 
+import java.awt.Color;
+
+import javax.annotation.Nullable;
+
 import gg.essential.api.utils.Multithreading;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -7,7 +11,10 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.*;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
@@ -15,12 +22,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import rosegoldclient.Main;
 import rosegoldclient.events.TickEndEvent;
 import rosegoldclient.utils.RenderUtils;
-import rosegoldclient.utils.Utils;
 import rosegoldclient.utils.VecUtils;
 import rosegoldclient.utils.pathfinding.Pathfinder;
-
-import javax.annotation.Nullable;
-import java.awt.*;
 
 public class CursorTP {
     private static BlockPos blockToTeleport;

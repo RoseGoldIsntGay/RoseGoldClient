@@ -1,12 +1,13 @@
 package rosegoldclient.mixins;
 
-import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraftforge.common.MinecraftForge;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraftforge.common.MinecraftForge;
 import rosegoldclient.events.PlayerMoveEvent;
 import rosegoldclient.events.ScreenClosedEvent;
 

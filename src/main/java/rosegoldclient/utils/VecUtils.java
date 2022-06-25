@@ -1,12 +1,12 @@
 package rosegoldclient.utils;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import rosegoldclient.Main;
-
-import java.util.ArrayList;
-import java.util.HashMap;
 
 public class VecUtils {
 

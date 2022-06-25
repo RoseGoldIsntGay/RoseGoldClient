@@ -1,11 +1,12 @@
 package rosegoldclient.utils;
 
-import com.google.common.collect.Iterables;
-import org.apache.commons.lang3.SystemUtils;
-
 import java.util.List;
 import java.util.Random;
 import java.util.function.Predicate;
+
+import org.apache.commons.lang3.SystemUtils;
+
+import com.google.common.collect.Iterables;
 
 public class ArrayUtils {
     public static Object getRandomItem(List<?> list) {

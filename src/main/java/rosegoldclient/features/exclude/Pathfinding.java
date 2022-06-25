@@ -1,18 +1,23 @@
 package rosegoldclient.features.exclude;
 
+import java.util.ArrayList;
+
 import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import rosegoldclient.Main;
 import rosegoldclient.events.TickEndEvent;
-import rosegoldclient.utils.*;
+import rosegoldclient.utils.CheetoRotation;
+import rosegoldclient.utils.ColorUtils;
+import rosegoldclient.utils.RenderUtils;
+import rosegoldclient.utils.Rotation;
+import rosegoldclient.utils.TimeHelper;
+import rosegoldclient.utils.Utils;
+import rosegoldclient.utils.VecUtils;
 import rosegoldclient.utils.pathfinding.Pathfinder;
-
-import java.util.ArrayList;
 
 public class Pathfinding {
     private static int stuckTicks = 0;

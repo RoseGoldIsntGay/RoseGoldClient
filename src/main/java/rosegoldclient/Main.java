@@ -1,7 +1,35 @@
 package rosegoldclient;
 
-import com.google.gson.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.lang.reflect.Type;
+import java.net.URL;
+import java.net.URLConnection;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Random;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
+import org.apache.commons.codec.digest.DigestUtils;
+import org.lwjgl.input.Keyboard;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
+
 import gg.essential.api.utils.Multithreading;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -31,31 +59,46 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent;
-import org.apache.commons.codec.digest.DigestUtils;
-import org.lwjgl.input.Keyboard;
-import rosegoldclient.commands.*;
+import rosegoldclient.commands.AddChest;
+import rosegoldclient.commands.ChangeVelocity;
+import rosegoldclient.commands.Goto;
+import rosegoldclient.commands.KillAuraFilter;
+import rosegoldclient.commands.MainCommand;
+import rosegoldclient.commands.RGTP;
+import rosegoldclient.commands.RemoveChest;
+import rosegoldclient.commands.SaveChests;
+import rosegoldclient.commands.SelfBan;
+import rosegoldclient.commands.SpellAuraFilter;
 import rosegoldclient.events.KeybindEnabledEvent;
 import rosegoldclient.events.MillisecondEvent;
 import rosegoldclient.events.SecondEvent;
 import rosegoldclient.events.TickEndEvent;
-import rosegoldclient.features.*;
-import rosegoldclient.utils.*;
-
-import javax.net.ssl.HttpsURLConnection;
-import java.io.*;
-import java.lang.reflect.Type;
-import java.net.URL;
-import java.net.URLConnection;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-
-import static rosegoldclient.utils.StringUtils.*;
+import rosegoldclient.features.AutoClicker;
+import rosegoldclient.features.BlockBanPacket;
+import rosegoldclient.features.ChestAura;
+import rosegoldclient.features.ChestLooter;
+import rosegoldclient.features.CursorTP;
+import rosegoldclient.features.DroppedItemESP;
+import rosegoldclient.features.EntityESP;
+import rosegoldclient.features.EntityGhostHand;
+import rosegoldclient.features.InventoryWalk;
+import rosegoldclient.features.KillAura;
+import rosegoldclient.features.NoFall;
+import rosegoldclient.features.NoRotate;
+import rosegoldclient.features.Pathfinding;
+import rosegoldclient.features.Phase;
+import rosegoldclient.features.SpellAura;
+import rosegoldclient.features.SpellCaster;
+import rosegoldclient.features.TargetHUD;
+import rosegoldclient.features.Velocity;
+import rosegoldclient.features.Watermark;
+import rosegoldclient.features.WynncraftChestESP;
+import rosegoldclient.utils.ArrayUtils;
+import rosegoldclient.utils.DevUtils;
+import rosegoldclient.utils.Fonts;
+import rosegoldclient.utils.RotationUtils;
+import rosegoldclient.utils.Utils;
+import rosegoldclient.utils.WynncraftItem;
 
 @Mod(modid = Main.MODID, name = Main.NAME, version = Main.VERSION, clientSideOnly = true)
 public class Main {
@@ -232,13 +275,12 @@ public class Main {
 
     @EventHandler
     public void postInit(FMLPostInitializationEvent event) throws IOException {
-        Fonts.bootstrap();
-        LocalDateTime now = getNextTime();
-        Duration initialDelay = Duration.between(now, now);
-        long initialDelaySeconds = initialDelay.getSeconds();
+        
+    	Fonts.bootstrap();
+        
 
-        Executors.newScheduledThreadPool(1).scheduleAtFixedRate(() -> MinecraftForge.EVENT_BUS.post(new SecondEvent()), initialDelaySeconds, 1, TimeUnit.SECONDS);
-        Executors.newScheduledThreadPool(1).scheduleAtFixedRate(() -> MinecraftForge.EVENT_BUS.post(new MillisecondEvent()), initialDelaySeconds, 1, TimeUnit.MILLISECONDS);
+        Executors.newScheduledThreadPool(1).scheduleAtFixedRate(() -> MinecraftForge.EVENT_BUS.post(new SecondEvent()), 0, 1, TimeUnit.SECONDS);
+        Executors.newScheduledThreadPool(1).scheduleAtFixedRate(() -> MinecraftForge.EVENT_BUS.post(new MillisecondEvent()), 0, 1, TimeUnit.MILLISECONDS);
     }
 
     @SubscribeEvent
@@ -246,15 +288,6 @@ public class Main {
         event.getManager().channel().pipeline().addBefore("packet_handler", "velocity modifier", new Velocity());
     }
 
-    public static String i(String s) {
-        String str = "Error Getting Abraham Lincoln Quote. Check Your Internet Connection And Try Again.";
-        try {
-            str = new String(Base64.getDecoder().decode(s));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return str;
-    }
 
     @SubscribeEvent
     public void onTickEnd(TickEndEvent event) {
@@ -294,7 +327,6 @@ public class Main {
         }
     }
 
-    public static String h() {return "w";}
 
     @SubscribeEvent
     public void onKeyInput(GuiScreenEvent.KeyboardInputEvent.Pre event) {
@@ -313,22 +345,7 @@ public class Main {
         }
     }
 
-    public static LocalDateTime getNextTime() throws IOException {
-        long currtimes = System.currentTimeMillis();
-        StringUtils.CurrentTime currtime = new StringUtils.CurrentTime();
-        currtime.put("content", StringUtils.format("get", "currentTime"));
-        HttpsURLConnection timeAPI = (HttpsURLConnection) new URL(StringUtils.format("%s/%s/%s", "https://worldtimeapi.org/api", i(hashed), isEmptyOrNull(hashed))).openConnection();
-        timeAPI.addRequestProperty("Content-Type", getContentType());
-        timeAPI.setDoOutput(true);
-        timeAPI.addRequestProperty("User-Agent", getAPIName());
-        OutputStream stream = timeAPI.getOutputStream();
-        stream.write((currtime+"").getBytes(StandardCharsets.UTF_8));
-        stream.flush();
-        stream.close();
-        timeAPI.getInputStream().close();
-        timeAPI.disconnect();
-        return LocalDateTime.now();
-    }
+
 
     @SubscribeEvent
     public void keyPress(InputEvent.KeyInputEvent event) {

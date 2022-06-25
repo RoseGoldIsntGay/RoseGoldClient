@@ -1,9 +1,9 @@
 package rosegoldclient.utils;
 
-import rosegoldclient.Main;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+
+import rosegoldclient.Main;
 
 public class ReflectionUtils {
     public static boolean invoke(Class<?> _class, String methodName) {

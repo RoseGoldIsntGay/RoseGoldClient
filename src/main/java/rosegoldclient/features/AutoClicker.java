@@ -1,8 +1,11 @@
 package rosegoldclient.features;
 
+import java.lang.reflect.Method;
+
+import org.lwjgl.input.Keyboard;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Slot;
 import net.minecraft.util.EnumHand;
@@ -10,13 +13,9 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
-import org.lwjgl.input.Keyboard;
 import rosegoldclient.Main;
 import rosegoldclient.events.MillisecondEvent;
 import rosegoldclient.utils.Utils;
-
-import java.lang.reflect.Method;
 
 public class AutoClicker {
 

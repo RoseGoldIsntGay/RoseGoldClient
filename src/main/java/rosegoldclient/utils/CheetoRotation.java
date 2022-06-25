@@ -1,13 +1,18 @@
 package rosegoldclient.utils;
 
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.*;
-import org.lwjgl.util.vector.Vector3f;
-import net.minecraft.entity.Entity;
-import net.minecraft.client.Minecraft;
-import rosegoldclient.Main;
-
 import java.util.ArrayList;
+
+import org.lwjgl.util.vector.Vector3f;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.entity.Entity;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
+import rosegoldclient.Main;
 
 public class CheetoRotation {
     private static final Minecraft mc;
