@@ -4,6 +4,7 @@
   "compatibilityLevel": "JAVA_8",
   "refmap": "rosegoldclient.refmap.json",
   "mixins": [
+    "MixinBlockFarmland",
     "MixinEntityLivingBase",
     "MixinNetHandlerLoginServer"
   ],
@@ -16,9 +17,13 @@
     "MixinEntityRenderer",
     "MixinFMLHandShake",
     "MixinGuiDisconnected",
+    "MixinGuiIngame",
+    "MixinMinecraft",
+    "MixinModelBiped",
     "MixinNetworkManager",
     "MixinRendererLivingEntity",
-    "MixinRenderString"
+    "MixinRenderString",
+    "PlayerSPAccessor"
   ],
   "minVersion": "0.8"
 }

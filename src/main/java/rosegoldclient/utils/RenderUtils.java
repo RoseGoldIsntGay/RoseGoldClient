@@ -76,12 +76,16 @@ public class RenderUtils {
 
     private static final AxisAlignedBB DEFAULT_AABB = new AxisAlignedBB(0, 0, 0, 1, 1, 1);
 
+    public static void drawEntityESP(Entity entity, int color, float partialTicks) {
+        drawEntityESP(entity, new Color((color >> 24 & 0xFF) / 255.0f, (color >> 16 & 0xFF) / 255.0f, (color >> 8 & 0xFF) / 255.0f), partialTicks);
+    }
+
     public static void drawEntityESP(Entity entity, Color color, float partialTicks) {
-        drawEntityESP(entity, color, partialTicks, new AxisAlignedBB(0,0,0,0,0.15,0));
+        drawEntityESP(entity, color, partialTicks, new AxisAlignedBB(0, 0, 0, 0, 0.15, 0));
     }
 
     public static void drawEntityESP(Entity entity, Color color, float partialTicks, AxisAlignedBB inflate) {
-        if(Main.configFile.silentMode) return;
+        if (Main.configFile.silentMode) return;
         final RenderManager renderManager = mc.getRenderManager();
 
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -120,12 +124,44 @@ public class RenderUtils {
         resetCaps();
     }
 
+    public static void drawPointESP(Vec3d vec3d, int color, float partialTicks) {
+        drawPointESP(vec3d, new Color((color >> 24 & 0xFF) / 255.0f, (color >> 16 & 0xFF) / 255.0f, (color >> 8 & 0xFF) / 255.0f), partialTicks);
+    }
+
+    public static void drawPointESP(Vec3d vec3d, Color color, float partialTicks) {
+        if (Main.configFile.silentMode) return;
+        RenderManager renderManager = mc.getRenderManager();
+
+        double x = vec3d.x - renderManager.viewerPosX;
+        double y = vec3d.y - renderManager.viewerPosY;
+        double z = vec3d.z - renderManager.viewerPosZ;
+
+        AxisAlignedBB axisAlignedBB = new AxisAlignedBB(x - 0.05, y - 0.05, z - 0.05, x + 0.05, y + 0.05, z + 0.05);
+
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        enableGlCap(GL_BLEND);
+        disableGlCap(GL_TEXTURE_2D, GL_DEPTH_TEST);
+        glDepthMask(false);
+
+        glLineWidth((float) 3);
+        enableGlCap(GL_LINE_SMOOTH);
+        glColor(color.getRed(), color.getGreen(), color.getBlue(), Main.configFile.espBlockOutlineAlpha);
+        drawOutlinedBox(axisAlignedBB);
+
+        glColor(color.getRed(), color.getGreen(), color.getBlue(), Main.configFile.espBlockBoxAlpha);
+        drawSolidBox(axisAlignedBB);
+
+        GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+        glDepthMask(true);
+        resetCaps();
+    }
+
     public static void drawBlockESP(BlockPos blockPos, int color, float partialTicks) {
         drawBlockESP(blockPos, new Color((color >> 24 & 0xFF) / 255.0f, (color >> 16 & 0xFF) / 255.0f, (color >> 8 & 0xFF) / 255.0f), partialTicks);
     }
 
     public static void drawBlockESP(BlockPos blockPos, Color color, float partialTicks) {
-        if(Main.configFile.silentMode) return;
+        if (Main.configFile.silentMode) return;
         final RenderManager renderManager = mc.getRenderManager();
 
         final double x = blockPos.getX() - renderManager.viewerPosX;
@@ -135,7 +171,7 @@ public class RenderUtils {
         AxisAlignedBB axisAlignedBB = new AxisAlignedBB(x, y, z, x + 1.0, y + 1.0, z + 1.0);
         final IBlockState iBlockState = mc.world.getBlockState(blockPos);
 
-        if(iBlockState != null) {
+        if (iBlockState != null) {
             final EntityPlayer player = mc.player;
 
             final double posX = player.lastTickPosX + (player.posX - player.lastTickPosX) * partialTicks;
@@ -272,7 +308,7 @@ public class RenderUtils {
         GlStateManager.rotate(-Main.mc.getRenderManager().playerViewX, 1.0F, 0.0F, 0.0F);
         GlStateManager.rotate(Main.mc.getRenderManager().playerViewY, 0.0F, 1.0F, 0.0F);
 
-        if(showDist) {
+        if (showDist) {
             if (Main.configFile.nametagDistanceDecimalPoints == 0) {
                 drawNametag("§e" + Math.round(dist) + " blocks");
             } else {

@@ -39,8 +39,8 @@ public class Utils {
         Main.mc.player.sendChatMessage(message);
     }
 
-    public static void sendModMessage(String message) {
-        sendMessage("&f[&aRoseGoldClient&f] " + message);
+    public static void sendModMessage(Object message) {
+        sendMessage("&f[&aRoseGoldClient&f] " + message.toString());
     }
 
     public static String getGuiName(GuiScreen gui) {

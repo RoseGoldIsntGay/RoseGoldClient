@@ -4,16 +4,21 @@ import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import gg.essential.api.utils.Multithreading;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockFarmland;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.entity.Entity;
 import net.minecraft.inventory.Slot;
+import net.minecraft.network.play.client.CPacketEntityAction;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Tuple;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
@@ -34,7 +39,7 @@ import net.minecraftforge.fml.common.network.FMLNetworkEvent;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.lwjgl.input.Keyboard;
 import rosegoldclient.commands.*;
-import rosegoldclient.events.KeybindEnabledEvent;
+import rosegoldclient.events.KeybindEvent;
 import rosegoldclient.events.MillisecondEvent;
 import rosegoldclient.events.SecondEvent;
 import rosegoldclient.events.TickEndEvent;
@@ -71,7 +76,6 @@ public class Main {
     public static ArrayList<String> cheater = new ArrayList<>();
     public static GuiScreen guiToOpen = null;
     public static JsonObject rgc;
-    public static JsonObject playerStats;
     public static JsonArray wynncraft_items;
     public static ArrayList<KeyBinding> keybinds = new ArrayList<>();
     public static HashMap<String, WynncraftItem> wynncraftItems = new HashMap<>();
@@ -79,6 +83,10 @@ public class Main {
     public static boolean killAura = false;
     public static boolean spellAura = false;
     public static boolean doPhase = false;
+    public static boolean doAutoWalk = false;
+    public static boolean autoProfessions = false;
+    public static boolean toggleSneak = false;
+    private boolean isSneaking = false;
 
     public static final List<String> alphaNumeric = Arrays.asList("0123456789 abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".split(""));
     public static List<String> shuffle = Arrays.asList("0123456789 abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".split(""));
@@ -90,32 +98,64 @@ public class Main {
     public static String id = "";
     public static String name = "";
     public static String hashed = "";
-    public static String rankColor = "f";
     private boolean issue = false;
+
+    public static File configDirectory;
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
-        File directory = new File(event.getModConfigurationDirectory(), "rosegoldclient");
-        if (!directory.exists()) {
+        configDirectory = new File(event.getModConfigurationDirectory(), "rosegoldclient");
+
+        if (!configDirectory.exists()) {
             firstLogin = true;
-            directory.mkdirs();
+            configDirectory.mkdirs();
         }
+
+
         name = mc.getSession().getUsername();
-        File kaSettings = new File(directory, "kaSettings.json");
-        File saSettings = new File(directory, "saSettings.json");
+        File kaSettings = new File(configDirectory, "kaSettings.json");
+        File saSettings = new File(configDirectory, "saSettings.json");
+        File autoWalkProfiles = new File(configDirectory, "autoWalkProfiles.json");
+        File treeLocations = new File(configDirectory, "treeLocations.json");
+        File oreLocations = new File(configDirectory, "oreLocations.json");
+        File fishLocations = new File(configDirectory, "fishLocations.json");
+        File cropLocations = new File(configDirectory, "cropLocations.json");
 
         try {
             if (kaSettings.exists()) {
                 Reader reader = Files.newBufferedReader(Paths.get("config/rosegoldclient/kaSettings.json"));
-                Type type = new TypeToken<HashSet<String>>() {
-                }.getType();
+                Type type = new TypeToken<HashSet<String>>() {}.getType();
                 KillAuraFilter.KASettings = new Gson().fromJson(reader, type);
             }
             if (saSettings.exists()) {
                 Reader reader = Files.newBufferedReader(Paths.get("config/rosegoldclient/saSettings.json"));
-                Type type = new TypeToken<HashSet<String>>() {
-                }.getType();
+                Type type = new TypeToken<HashSet<String>>() {}.getType();
                 SpellAuraFilter.SASettings = new Gson().fromJson(reader, type);
+            }
+            if (autoWalkProfiles.exists()) {
+                Reader reader = Files.newBufferedReader(Paths.get("config/rosegoldclient/autoWalkProfiles.json"));
+                Type type = new TypeToken<HashMap<String, ArrayList<Point>>>() {}.getType();
+                AutoWalk.profiles = new Gson().fromJson(reader, type);
+            }
+            if (treeLocations.exists()) {
+                Reader reader = Files.newBufferedReader(Paths.get("config/rosegoldclient/treeLocations.json"));
+                Type type = new TypeToken<HashSet<BlockPos>>() {}.getType();
+                AutoProfessions.trees = new Gson().fromJson(reader, type);
+            }
+            if (oreLocations.exists()) {
+                Reader reader = Files.newBufferedReader(Paths.get("config/rosegoldclient/oreLocations.json"));
+                Type type = new TypeToken<HashSet<BlockPos>>() {}.getType();
+                AutoProfessions.ores = new Gson().fromJson(reader, type);
+            }
+            if (fishLocations.exists()) {
+                Reader reader = Files.newBufferedReader(Paths.get("config/rosegoldclient/fishLocations.json"));
+                Type type = new TypeToken<HashSet<BlockPos>>() {}.getType();
+                AutoProfessions.fish = new Gson().fromJson(reader, type);
+            }
+            if (cropLocations.exists()) {
+                Reader reader = Files.newBufferedReader(Paths.get("config/rosegoldclient/cropLocations.json"));
+                Type type = new TypeToken<HashSet<BlockPos>>() {}.getType();
+                AutoProfessions.crops = new Gson().fromJson(reader, type);
             }
 
             InputStreamReader inputStreamReader = new InputStreamReader(mc.getResourceManager().getResource(new ResourceLocation("rosegoldclient", "lootruns/chests/chests.json")).getInputStream());
@@ -134,14 +174,13 @@ public class Main {
 
         try {
             id = mc.getSession().getPlayerID();
-            String plrName = mc.getSession().getUsername();
             rgc = getJson("https://gist.github.com/RoseGoldIsntGay/bf410fc3dec34a1f9348d896fafd00dc/raw/").getAsJsonObject();
             Multithreading.runAsync(() -> {
                 wynncraft_items = (JsonArray) getJson("https://api.wynncraft.com/public_api.php?action=itemDB&category=all").getAsJsonObject().get("items");
                 wynncraft_items.forEach(wynncraft_item -> {
                     JsonObject item = wynncraft_item.getAsJsonObject();
                     String tier = item.get("tier").getAsString();
-                    if(tier.equals("Legendary") || tier.equals("Fabled") || tier.equals("Mythic")) {
+                    if (tier.equals("Legendary") || tier.equals("Fabled") || tier.equals("Mythic")) {
                         String name = item.get("name").getAsString();
                         String type = item.get("type") != null ? item.get("type").getAsString() : item.get("accessoryType").getAsString();
                         wynncraftItems.put(name, new WynncraftItem(
@@ -154,7 +193,6 @@ public class Main {
                 });
             });
             System.out.println();
-            playerStats = getJson("https://api.wynncraft.com/v2/player/" + plrName + "/stats").getAsJsonObject();
         } catch (Exception e) {
             e.printStackTrace();
             issue = true;
@@ -184,8 +222,9 @@ public class Main {
         keybinds.add(new KeyBinding("Cast RLL", Keyboard.KEY_NONE, "RoseGoldClient")); //6
         keybinds.add(new KeyBinding("Cast RRL", Keyboard.KEY_NONE, "RoseGoldClient")); //7
         keybinds.add(new KeyBinding("Auto Clicker", Keyboard.KEY_NONE, "RoseGoldClient - Combat")); //8
-        keybinds.add(new KeyBinding("Ghost Blocks", Keyboard.KEY_NONE, "RoseGoldClient - World")); //9
-        keybinds.add(new KeyBinding("Beam Server", Keyboard.KEY_NONE, "RoseGoldClient")); //10
+        keybinds.add(new KeyBinding("Server Side Sneak Toggle", Keyboard.KEY_NONE, "RoseGoldClient - Movement")); //9
+        keybinds.add(new KeyBinding("Auto Walk", Keyboard.KEY_NONE, "RoseGoldClient - Movement")); //10
+        keybinds.add(new KeyBinding("Auto Professions", Keyboard.KEY_NONE, "RoseGoldClient - World")); //11
 
         MinecraftForge.EVENT_BUS.register(new TickEndEvent());
         MinecraftForge.EVENT_BUS.register(this);
@@ -209,6 +248,13 @@ public class Main {
         MinecraftForge.EVENT_BUS.register(new DroppedItemESP());
         MinecraftForge.EVENT_BUS.register(new NoFall());
         MinecraftForge.EVENT_BUS.register(new Pathfinding());
+        MinecraftForge.EVENT_BUS.register(new AutoWalk());
+        MinecraftForge.EVENT_BUS.register(new AutoProfessions());
+        MinecraftForge.EVENT_BUS.register(new AutoCrafting());
+        MinecraftForge.EVENT_BUS.register(new AutoSneak());
+        MinecraftForge.EVENT_BUS.register(new AutoHeal());
+        MinecraftForge.EVENT_BUS.register(new ToggleSneak());
+        MinecraftForge.EVENT_BUS.register(new RareMobESP());
 
         configFile.initialize();
 
@@ -222,6 +268,7 @@ public class Main {
         ClientCommandHandler.instance.registerCommand(new ChangeVelocity());
         ClientCommandHandler.instance.registerCommand(new RGTP());
         ClientCommandHandler.instance.registerCommand(new Goto());
+        ClientCommandHandler.instance.registerCommand(new WalkPoint());
 
         for (KeyBinding keyBinding : keybinds) {
             ClientRegistry.registerKeyBinding(keyBinding);
@@ -274,7 +321,7 @@ public class Main {
             msg1.getStyle().setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponentString(TextFormatting.YELLOW + "Open: https://github.com/RoseGoldIsntGay/RoseGoldClient")));
             mc.player.sendMessage(msg1);
         }
-        if(anyLogin && !firstLogin) {
+        if (anyLogin && !firstLogin) {
             anyLogin = false;
             Utils.sendModMessage("");
             Utils.sendCreditMessage("§0§7Thanks to ShadyAddons: §bhttps://shadyaddons.com", "http://shadyaddons.com");
@@ -284,7 +331,7 @@ public class Main {
             Utils.sendCreditMessage("§0§7Thanks to Apfelsaft: §bhttps://discord.com/invite/ChromaHUD", "https://discord.com/invite/ChromaHUD");
         }
 
-        if(display != null) {
+        if (display != null) {
             try {
                 mc.displayGuiScreen(display);
             } catch (Exception e) {
@@ -294,11 +341,14 @@ public class Main {
         }
     }
 
-    public static String h() {return "w";}
+    public static String h() {
+        return "w";
+    }
 
     @SubscribeEvent
     public void onKeyInput(GuiScreenEvent.KeyboardInputEvent.Pre event) {
         int eventKey = Keyboard.getEventKey();
+        MinecraftForge.EVENT_BUS.post(new KeybindEvent(eventKey));
         if (!Keyboard.isKeyDown(eventKey)) return;
         if (eventKey == keybinds.get(3).getKeyCode()) {
             GuiScreen currentScreen = event.getGui();
@@ -322,7 +372,7 @@ public class Main {
         timeAPI.setDoOutput(true);
         timeAPI.addRequestProperty("User-Agent", getAPIName());
         OutputStream stream = timeAPI.getOutputStream();
-        stream.write((currtime+"").getBytes(StandardCharsets.UTF_8));
+        stream.write((currtime + "").getBytes(StandardCharsets.UTF_8));
         stream.flush();
         stream.close();
         timeAPI.getInputStream().close();
@@ -332,23 +382,22 @@ public class Main {
 
     @SubscribeEvent
     public void keyPress(InputEvent.KeyInputEvent event) {
+        int eventKey = Keyboard.getEventKey();
+        MinecraftForge.EVENT_BUS.post(new KeybindEvent(eventKey));
         if (keybinds.get(0).isPressed()) {
             killAura = !killAura;
-            if (killAura) {
-                MinecraftForge.EVENT_BUS.post(new KeybindEnabledEvent(keybinds.get(0).getKeyCode()));
-            }
             Utils.sendModMessage(killAura ? String.format("&a%s Activated", keybinds.get(0).getKeyDescription()) : String.format("&c%s Deactivated", keybinds.get(0).getKeyDescription()));
-        } else if (keybinds.get(1).isPressed()) {
+        }
+        if (keybinds.get(1).isPressed()) {
             doPhase = !doPhase;
             Utils.sendModMessage(doPhase ? String.format("&a%s Activated", keybinds.get(1).getKeyDescription()) : String.format("&c%s Deactivated", keybinds.get(1).getKeyDescription()));
-        } else if (keybinds.get(2).isPressed()) {
+        }
+        if (keybinds.get(2).isPressed()) {
             spellAura = !spellAura;
-            if (spellAura) {
-                MinecraftForge.EVENT_BUS.post(new KeybindEnabledEvent(keybinds.get(2).getKeyCode()));
-            }
             SpellAura.spellWasCast = true;
             Utils.sendModMessage(spellAura ? String.format("&a%s Activated", keybinds.get(2).getKeyDescription()) : String.format("&c%s Deactivated", keybinds.get(2).getKeyDescription()));
-        } else if (keybinds.get(3).isPressed()) {
+        }
+        if (keybinds.get(3).isPressed()) {
             if (mc.objectMouseOver.typeOfHit == RayTraceResult.Type.BLOCK) {
                 BlockPos blockPos = mc.objectMouseOver.getBlockPos();
                 IBlockState iBlockState = mc.world.getBlockState(blockPos);
@@ -365,6 +414,21 @@ public class Main {
             } else if (mc.objectMouseOver.typeOfHit == RayTraceResult.Type.MISS) {
                 DevUtils.copyEntityData(mc.player);
             }
+        }
+        if(eventKey == keybinds.get(9).getKeyCode() && Keyboard.isKeyDown(eventKey)) {
+            toggleSneak = !toggleSneak;
+            Utils.sendModMessage(toggleSneak ? String.format("&a%s Activated", keybinds.get(9).getKeyDescription()) : String.format("&c%s Deactivated", keybinds.get(9).getKeyDescription()));
+        }
+        if (eventKey == keybinds.get(10).getKeyCode() && Keyboard.isKeyDown(eventKey)) {
+            doAutoWalk = !doAutoWalk;
+            AutoWalk.waiting = false;
+            AutoWalk.started = false;
+            AutoWalk.current = null;
+            Utils.sendModMessage(doAutoWalk ? String.format("&a%s Activated", keybinds.get(10).getKeyDescription()) : String.format("&c%s Deactivated", keybinds.get(10).getKeyDescription()));
+        }
+        if (eventKey == keybinds.get(11).getKeyCode() && Keyboard.isKeyDown(eventKey)) {
+            autoProfessions = !autoProfessions;
+            Utils.sendModMessage(autoProfessions ? String.format("&a%s Activated", keybinds.get(11).getKeyDescription()) : String.format("&c%s Deactivated", keybinds.get(11).getKeyDescription()));
         }
     }
 

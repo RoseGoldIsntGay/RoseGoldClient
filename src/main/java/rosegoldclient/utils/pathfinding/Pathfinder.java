@@ -8,11 +8,14 @@ import java.util.ArrayList;
 public class Pathfinder {
     private static AStarCustomPathfinder pathfinder;
     public static ArrayList<Vec3d> path;
+    public static BlockPos goal;
+
 
     public static void setup(BlockPos from, BlockPos to, double minDistance) {
         pathfinder = new AStarCustomPathfinder(new Vec3d(from), new Vec3d(to), minDistance);
         pathfinder.compute();
         path = pathfinder.getPath();
+        goal = to;
     }
 
     public static Vec3d getCurrent() {

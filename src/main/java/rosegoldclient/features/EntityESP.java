@@ -24,10 +24,10 @@ public class EntityESP {
     }
 
     private static boolean checkName(String name) {
-        if(name.contains("[Lv") && name.contains("]")) {
+        if (name.contains("[Lv") && name.contains("]")) {
             return true;
         }
-        if(Main.configFile.NPCESP && name.contains("NPC")) {
+        if (Main.configFile.NPCESP && name.contains("NPC")) {
             return true;
         }
         return false;
@@ -35,28 +35,34 @@ public class EntityESP {
 
     @SubscribeEvent
     public void onRenderEntityLiving(RenderLivingEntityEvent event) {
-        if (!Main.configFile.entityESP || checked.contains(event.entity)) return;
+        if (checked.contains(event.entity)) return;
+        if (Main.configFile.revealInsivibleEntities) event.entity.setInvisible(false);
+        if (!Main.configFile.entityESP && !Main.configFile.NPCESP) return;
         if (event.entity.hasCustomName() && checkName(event.entity.getCustomNameTag())) {
-            if(Main.configFile.entityESPRange != 0 && event.entity.getDistance(Main.mc.player) > Main.configFile.entityESPRange) return;
+            if (Main.configFile.entityESPRange != 0 && event.entity.getDistance(Main.mc.player) > Main.configFile.entityESPRange)
+                return;
             if (event.entity instanceof EntityArmorStand) {
                 List<Entity> possibleEntities = event.entity.getEntityWorld().getEntitiesInAABBexcluding(event.entity, event.entity.getEntityBoundingBox().offset(0, -1, 0), entity -> (!(entity instanceof EntityArmorStand) && entity != Main.mc.player));
                 if (!possibleEntities.isEmpty()) {
                     highlightEntity(possibleEntities.get(0), event.entity.getCustomNameTag());
+                } else {
+                    highlightEntity(event.entity, event.entity.getCustomNameTag());
                 }
             } else {
                 highlightEntity(event.entity, event.entity.getCustomNameTag());
             }
             checked.add(event.entity);
         }
+
     }
 
     @SubscribeEvent
     public void onRenderWorld(RenderWorldLastEvent event) {
-        if (!Main.configFile.entityESP) return;
+        if (!Main.configFile.entityESP && !Main.configFile.NPCESP) return;
         Main.mc.world.loadedEntityList.forEach(entity -> {
             if (highlightedEntities.containsKey(entity)) {
                 String name = highlightedEntities.get(entity);
-                Color color = name.contains("§a") ? Color.GREEN : name.contains("§b") ? Color.CYAN : name.contains("§c") ? Color.RED : name.contains("§7") ? new Color(0, 127, 0) : Color.WHITE ;
+                Color color = name.contains("§a") ? Color.GREEN : name.contains("§b") ? Color.CYAN : name.contains("§c") ? Color.RED : name.contains("§7") ? new Color(0, 127, 0) : Color.WHITE;
                 RenderUtils.drawEntityESP(entity, color, event.getPartialTicks());
                 RenderUtils.renderWaypointText(name, entity.posX, entity.posY + entity.height, entity.posZ, event.getPartialTicks());
             }
@@ -65,8 +71,9 @@ public class EntityESP {
 
     @SubscribeEvent
     public void onTick(TickEvent.ClientTickEvent event) {
-        if (!Main.configFile.entityESP || Main.mc.player == null) return;
-        if(Main.mc.player.ticksExisted % 40 == 0) {
+        if (Main.mc.player == null) return;
+        if (!Main.configFile.entityESP && !Main.configFile.NPCESP) return;
+        if (Main.mc.player.ticksExisted % 40 == 0) {
             checked.clear();
         }
     }

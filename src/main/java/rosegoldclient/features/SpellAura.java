@@ -65,7 +65,7 @@ public class SpellAura {
     }
 
     @SubscribeEvent
-    public void onEnabled(KeybindEnabledEvent event) {
+    public void onEnabled(KeybindEvent event) {
         currentSpell = null;
         spellWasCast = false;
         index = 0;
@@ -177,9 +177,10 @@ public class SpellAura {
         if(!Main.spellAura || !Main.configFile.spellAura || Main.mc.player == null || Main.mc.world == null) return;
         if(target == null) return;
         if(spellWasCast) return;
+        spellWasCast = true;
+        if(currentSpell == null) return;
         castSpell(currentSpell.spell);
         delay = currentSpell.delay;
-        spellWasCast = true;
     }
 
     @SubscribeEvent
@@ -191,12 +192,11 @@ public class SpellAura {
 
     private static Spell getNextSpell() {
         index++;
-        //Utils.sendModMessage("Next Spell: "+spellCycle.get((index) % spellCycle.size()));
         return spellCycle.get((index) % spellCycle.size());
     }
 
     private static EntityLivingBase getEntity() {
-        if(Main.mc.currentScreen != null || Main.mc.world == null) return null;
+        if(Main.mc.world == null) return null;
         float range = Main.configFile.spellAuraRange;
 
         List<Entity> entityList = Main.mc.world.getLoadedEntityList().stream().filter(
@@ -218,6 +218,7 @@ public class SpellAura {
         if(Main.configFile.spellAuraCustomNames && !entity.hasCustomName()) {
             return false;
         }
+        if(entity.getCustomNameTag().contains(" By ")) return false;
         if(Main.configFile.spellAuraFilter) {
             if(Main.configFile.spellAuraFilterBlacklist) {
                 for (String search : SpellAuraFilter.SASettings) {

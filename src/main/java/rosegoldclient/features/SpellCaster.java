@@ -1,8 +1,11 @@
 package rosegoldclient.features;
 
+import gg.essential.api.utils.Multithreading;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.client.CPacketAnimation;
+import net.minecraft.network.play.client.CPacketEntityAction;
+import net.minecraft.network.play.client.CPacketPlayer;
 import net.minecraft.network.play.client.CPacketPlayerTryUseItem;
 import net.minecraft.util.EnumHand;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -10,6 +13,7 @@ import net.minecraftforge.fml.common.gameevent.InputEvent;
 import org.lwjgl.input.Keyboard;
 import rosegoldclient.Main;
 import rosegoldclient.events.TickEndEvent;
+import rosegoldclient.utils.Utils;
 
 import java.util.ArrayList;
 
@@ -57,7 +61,24 @@ public class SpellCaster {
 
     public static void processPackets() {
         assert Main.mc.getConnection() != null;
-        Main.mc.getConnection().getNetworkManager().sendPacket(packetList.get(0));
+        if(packetList.get(0) == use) {
+            if(AutoSneak.abilityReady) {
+                Multithreading.runAsync(() -> {
+                    try {
+                        Main.mc.getConnection().getNetworkManager().sendPacket(new CPacketEntityAction(Main.mc.player, CPacketEntityAction.Action.START_SNEAKING));
+                        Thread.sleep(100);
+                        Main.mc.getConnection().getNetworkManager().sendPacket(packetList.get(0));
+                        Thread.sleep(100);
+                        Main.mc.getConnection().getNetworkManager().sendPacket(new CPacketEntityAction(Main.mc.player, CPacketEntityAction.Action.STOP_SNEAKING));
+                    } catch (Exception ignored) {
+                    }
+                });
+            } else {
+                Main.mc.getConnection().getNetworkManager().sendPacket(packetList.get(0));
+            }
+        } else {
+            Main.mc.getConnection().getNetworkManager().sendPacket(packetList.get(0));
+        }
         packetList.remove(0);
     }
 

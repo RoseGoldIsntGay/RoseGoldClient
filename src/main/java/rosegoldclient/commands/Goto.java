@@ -9,7 +9,6 @@ import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
 import rosegoldclient.Main;
 import rosegoldclient.features.Pathfinding;
-import rosegoldclient.utils.Utils;
 import rosegoldclient.utils.VecUtils;
 import rosegoldclient.utils.pathfinding.Pathfinder;
 
@@ -38,12 +37,12 @@ public class Goto extends CommandBase {
         String y = args[1];
         String z = args[2];
         Multithreading.runAsync(() -> {
-            Pathfinder.setup(new BlockPos(VecUtils.floorVec(Main.mc.player.getPositionVector())), new BlockPos(Integer.parseInt(x), Integer.parseInt(y), Integer.parseInt(z)), 0.0);
-            if (Pathfinder.hasPath()) {
-                Pathfinding.init();
+            if (Main.configFile.pathfindingGotoWalk) {
+                Pathfinding.initWalk();
             } else {
-                Utils.sendModMessage(String.format("Could not find a path for X: %s, Y: %s, Z: %s", x, y, z));
+                Pathfinding.initTeleport();
             }
+            Pathfinder.setup(new BlockPos(VecUtils.floorVec(Main.mc.player.getPositionVector())), new BlockPos(Integer.parseInt(x), Integer.parseInt(y), Integer.parseInt(z)), 0.0);
         });
     }
 }

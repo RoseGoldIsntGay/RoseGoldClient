@@ -84,7 +84,7 @@ public class SpellAuraFilter extends CommandBase {
     private void saveMacros() {
         try {
             String json = new Gson().toJson(SASettings);
-            Files.write(Paths.get("./config/rosegoldclient/SASettings.json"), json.getBytes(StandardCharsets.UTF_8));
+            Files.write(Paths.get("./config/rosegoldclient/saSettings.json"), json.getBytes(StandardCharsets.UTF_8));
         } catch (Exception error) {
             System.out.println("Error saving config file");
             error.printStackTrace();

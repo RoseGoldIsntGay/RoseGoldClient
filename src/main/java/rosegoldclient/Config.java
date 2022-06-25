@@ -35,6 +35,30 @@ public class Config extends Vigilant {
      * Macros
      */
 
+    @Property(type = PropertyType.SWITCH, name = "Auto Professions", description = "Automatically grind professions",
+            category = "Macros", subcategory = "Auto Professions")
+    public boolean autoProfessions = false;
+
+    @Property(type = PropertyType.SELECTOR, name = "Auto Professions Type",
+            category = "Macros", subcategory = "Auto Professions", options = {"Aura", "Pathfind"})
+    public int autoProfessionsType = 0;
+
+    @Property(type = PropertyType.SELECTOR, name = "Auto Professions Gather Type",
+            category = "Macros", subcategory = "Auto Professions", options = {"Right Click", "Left Click"})
+    public int autoProfessionsGatherType = 0;
+
+    @Property(type = PropertyType.SELECTOR, name = "Auto Professions Skill Type",
+            category = "Macros", subcategory = "Auto Professions", options = {"Woodcutting", "Mining", "Fishing", "Farming"})
+    public int autoProfessionsSkillType = 0;
+
+    @Property(type = PropertyType.SLIDER, name = "Auto Professions Node Regrow Time", description = "Set time in seconds",
+            category = "Macros", subcategory = "Auto Professions", min = 1, max = 120)
+    public int autoProfessionsNodeRegrowTime = 60;
+
+    @Property(type = PropertyType.SLIDER, name = "Auto Professions Max Pathfind Distance", description = "Don't pathfind to nodes that are too far",
+            category = "Macros", subcategory = "Auto Professions", min = 50, max = 150)
+    public int autoProfessionsNodeMaxDistance = 100;
+
     @Property(type = PropertyType.SWITCH, name = "Auto Clicker", description = "Set keybind under controls",
             category = "Macros", subcategory = "Auto Clicker")
     public boolean autoClicker = false;
@@ -58,6 +82,14 @@ public class Config extends Vigilant {
     @Property(type = PropertyType.SLIDER, name = "Chest Looter Delay", description = "in milliseconds",
             category = "Loot Running", subcategory = "Chest Looter", max = 500)
     public int chestLootDelay = 100;
+
+    @Property(type = PropertyType.SWITCH, name = "Enable Chest Looter Filter",
+            category = "Loot Running", subcategory = "Chest Looter")
+    public boolean doChestLootFilter = false;
+
+    @Property(type = PropertyType.PARAGRAPH, name = "Chest Looter Filter", description = "Separate with commas",
+            category = "Loot Running", subcategory = "Chest Looter")
+    public String chestLootFilter = "";
 
     @Property(type = PropertyType.SWITCH, name = "Chest Aura", description = "Open loot chests in range of the player",
             category = "Loot Running", subcategory = "Chest Aura")
@@ -92,60 +124,96 @@ public class Config extends Vigilant {
         public int wynnChestESPRange = 50;
 
     /*
-     * ESP
+     * Render
      */
 
+    @Property(type = PropertyType.SWITCH, name = "Show Server Side Rotations",
+            category = "Render", subcategory = "Animations")
+    public boolean showServerSideRotations = false;
+
     @Property(type = PropertyType.SLIDER, name = "Entity ESP Outline Alpha", description = "Set outline transparency for entity outline ESPs",
-            category = "ESP", subcategory = "ESP Settings", max = 255)
+            category = "Render", subcategory = "ESP Settings", max = 255)
     public int espEntityOutlineAlpha = 200;
 
     @Property(type = PropertyType.SLIDER, name = "Entity ESP Box Alpha", description = "Set outline transparency for entity box ESPs",
-            category = "ESP", subcategory = "ESP Settings", max = 255)
+            category = "Render", subcategory = "ESP Settings", max = 255)
     public int espEntityBoxAlpha = 100;
 
     @Property(type = PropertyType.SLIDER, name = "Block ESP Outline Alpha", description = "Set outline transparency for block outline ESPs",
-            category = "ESP", subcategory = "ESP Settings", max = 255)
+            category = "Render", subcategory = "ESP Settings", max = 255)
     public int espBlockOutlineAlpha = 200;
 
     @Property(type = PropertyType.SLIDER, name = "Block ESP Box Alpha", description = "Set outline transparency for block box ESPs",
-            category = "ESP", subcategory = "ESP Settings", max = 255)
+            category = "Render", subcategory = "ESP Settings", max = 255)
     public int espBlockBoxAlpha = 0;
 
     @Property(type = PropertyType.SLIDER, name = "Distance Accuracy", description = "How many decimals points to show when displaying distance",
-            category = "ESP", subcategory = "ESP Settings", max = 4)
+            category = "Render", subcategory = "ESP Settings", max = 4)
     public int nametagDistanceDecimalPoints = 0;
 
+    @Property(type = PropertyType.SWITCH, name = "Rare Mob ESP",
+            category = "Render", subcategory = "Rare Mob ESP")
+    public boolean rareMobESP = false;
+
+    @Property(type = PropertyType.SWITCH, name = "Notify Rare Mob", description = "Dingdingdingdingdingding",
+            category = "Render", subcategory = "Rare Mob ESP")
+    public boolean notifyRareMobESP = false;
+
+    @Property(type = PropertyType.PARAGRAPH, name = "Rare Mob Filter", description = "Separate with commas",
+            category = "Render", subcategory = "Rare Mob ESP")
+    public String rareMobESPFilter = "";
+
     @Property(type = PropertyType.SWITCH, name = "Entity ESP",
-            category = "ESP", subcategory = "Entity ESP")
+            category = "Render", subcategory = "Entity ESP")
     public boolean entityESP = false;
 
         @Property(type = PropertyType.SLIDER, name = "Entity ESP Range", description = "0 = unlimited",
-                category = "ESP", subcategory = "Entity ESP", max = 64)
+                category = "Render", subcategory = "Entity ESP", max = 64)
         public int entityESPRange = 0;
 
+        @Property(type = PropertyType.SWITCH, name = "Reveal Invisible Entities", description = "",
+                category = "Render", subcategory = "Entity ESP")
+        public boolean revealInsivibleEntities = false;
+
     @Property(type = PropertyType.SWITCH, name = "NPC ESP",
-            category = "ESP", subcategory = "NPC ESP")
+            category = "Render", subcategory = "NPC ESP")
     public boolean NPCESP = false;
 
     @Property(type = PropertyType.SWITCH, name = "Dropped Item ESP", description = "Highlight dropped items considered rare",
-            category = "ESP", subcategory = "Dropped Item ESP")
+            category = "Render", subcategory = "Dropped Item ESP")
     public boolean droppedItemESP = false;
 
         @Property(type = PropertyType.SWITCH, name = "Highlight Legendaries",
-                category = "ESP", subcategory = "Dropped Item ESP")
+                category = "Render", subcategory = "Dropped Item ESP")
         public boolean droppedItemESPLegendaries = true;
 
         @Property(type = PropertyType.SWITCH, name = "Highlight Fableds",
-                category = "ESP", subcategory = "Dropped Item ESP")
+                category = "Render", subcategory = "Dropped Item ESP")
         public boolean droppedItemESPFableds = true;
 
         @Property(type = PropertyType.SWITCH, name = "Highlight Mythics", description = "Includes on-screen message and loud notification sound",
-                category = "ESP", subcategory = "Dropped Item ESP")
+                category = "Render", subcategory = "Dropped Item ESP")
         public boolean droppedItemESPMythics = true;
+
+    @Property(type = PropertyType.SWITCH, name = "Antiblind", description = "Remove blindness",
+            category = "Render", subcategory = "Antiblind")
+    public boolean antiblind = false;
 
     /*
      * Movement
      */
+
+    @Property(type = PropertyType.SWITCH, name = "Auto Walk", description = "Auto Walk to points set with /walkpoint, toggle in controls",
+            category = "Movement", subcategory = "Auto Walk")
+    public boolean autoWalk = false;
+
+    @Property(type = PropertyType.SLIDER, name = "Auto Walk Wait Modifier", description = "Modifier to multiply all wait times, for easy point modification",
+            category = "Movement", subcategory = "Auto Walk", max = 3)
+    public int autoWalkWaitModifier = 1;
+
+    @Property(type = PropertyType.SWITCH, name = "Pathfind goto walk", description = "Change goto command to walk instead of teleport",
+            category = "Movement", subcategory = "Pathfinding")
+    public boolean pathfindingGotoWalk = false;
 
     @Property(type = PropertyType.SLIDER, name = "Pathfinding Unstuck time", description = "",
             category = "Movement", subcategory = "Pathfinding", min = 1, max = 10)
@@ -226,6 +294,14 @@ public class Config extends Vigilant {
     /*
      * Combat
      */
+
+    @Property(type = PropertyType.SWITCH, name = "Auto Heal", description = "Automatically heal using potions or spells",
+            category = "Combat", subcategory = "Auto Heal")
+    public boolean autoHeal = false;
+
+    @Property(type = PropertyType.SELECTOR, name = "Auto Heal Type", description = "Select auto heal type",
+            category = "Combat", subcategory = "Auto Heal", options = {"Potions", "Heal Spell"})
+    public int autoHealMode = 0;
 
     @Property(type = PropertyType.SLIDER, name = "Target HUD X",
             category = "Combat", max = 100)
@@ -378,6 +454,14 @@ public class Config extends Vigilant {
     @Property(type = PropertyType.SWITCH, name = "Entity Ghost Hand", description = "Interact with entities through walls",
             category = "World", subcategory = "Entity Ghost Hand")
     public boolean entityGhostHand = false;
+
+    @Property(type = PropertyType.SWITCH, name = "onGround",
+            category = "World", subcategory = "Entity Ghost Hand")
+    public boolean serverFunnyOnGround = false;
+
+    @Property(type = PropertyType.SLIDER, name = "amount",
+            category = "World", subcategory = "Entity Ghost Hand", min = 1, max = 5)
+    public int serverFunnyAmount = 1;
 
     public Config() {
         super(new File("./config/rosegoldclient/config.toml"), "§aRoseGoldClient", new JVMAnnotationPropertyCollector(), new ConfigSorting());

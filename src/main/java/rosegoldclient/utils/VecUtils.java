@@ -10,7 +10,18 @@ import java.util.HashMap;
 
 public class VecUtils {
 
-    private static HashMap<Integer, KeyBinding> keyBindMap;
+    private static final HashMap<Integer, KeyBinding> keyBindMap = new HashMap<Integer, KeyBinding>() {
+        {
+            this.put(0, Main.mc.gameSettings.keyBindForward);
+            this.put(90, Main.mc.gameSettings.keyBindLeft);
+            this.put(180, Main.mc.gameSettings.keyBindBack);
+            this.put(-90, Main.mc.gameSettings.keyBindRight);
+        }
+    };
+
+    public static Vec3d scaleVec(Vec3d vec3d, float scale) {
+        return new Vec3d(vec3d.x * scale, vec3d.y * scale, vec3d.z * scale);
+    }
 
     public static Vec3d floorVec(final Vec3d vec3) {
         return new Vec3d(Math.floor(vec3.x), Math.floor(vec3.y), Math.floor(vec3.z));
@@ -37,16 +48,5 @@ public class VecUtils {
             return;
         });
         return e;
-    }
-
-    static {
-        VecUtils.keyBindMap = new HashMap<Integer, KeyBinding>() {
-            {
-                this.put(0, Main.mc.gameSettings.keyBindForward);
-                this.put(90, Main.mc.gameSettings.keyBindLeft);
-                this.put(180, Main.mc.gameSettings.keyBindBack);
-                this.put(-90, Main.mc.gameSettings.keyBindRight);
-            }
-        };
     }
 }

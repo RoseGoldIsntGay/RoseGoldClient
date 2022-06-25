@@ -95,6 +95,7 @@ public class CursorTP {
 
     private static void pathfindToBlock(BlockPos blockPos) {
         Multithreading.runAsync(() -> {
+            Pathfinding.initTeleport();
             Pathfinder.setup(new BlockPos(VecUtils.floorVec(Main.mc.player.getPositionVector())), blockPos, 0);
         });
     }

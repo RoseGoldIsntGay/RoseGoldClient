@@ -1,7 +1,6 @@
 package rosegoldclient.utils;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
@@ -73,7 +72,7 @@ public class RotationUtils {
 
     public static Rotation getRotationToEntity(Entity entity) {
         double diffX = entity.posX - Main.mc.player.posX;
-        double diffY = entity.posY + entity.getEyeHeight() - Main.mc.player.posY - Main.mc.player.getEyeHeight();
+        double diffY = entity.posY + entity.getEyeHeight() - Main.mc.player.posY - Main.mc.player.getEyeHeight() - 1;
         double diffZ = entity.posZ - Main.mc.player.posZ;
         double dist = Math.sqrt(diffX * diffX + diffZ * diffZ);
 
@@ -142,7 +141,9 @@ public class RotationUtils {
 
     public static void look(Rotation rotation) {
         Main.mc.player.rotationPitch = rotation.pitch;
-        Main.mc.player.rotationYaw = rotation.yaw;
+        if(rotation.pitch > -80 && rotation.pitch < 80) {
+            Main.mc.player.rotationYaw = rotation.yaw;
+        }
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)

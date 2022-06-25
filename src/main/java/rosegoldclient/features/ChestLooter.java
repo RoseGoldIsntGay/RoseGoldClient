@@ -9,6 +9,8 @@ import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import rosegoldclient.Main;
+import rosegoldclient.events.SecondEvent;
+import rosegoldclient.events.TickEndEvent;
 import rosegoldclient.utils.Utils;
 
 import java.util.*;
@@ -18,7 +20,7 @@ import java.util.stream.Stream;
 public class ChestLooter {
     private long lastClickTime = 0L;
     private final List<Map.Entry<Slot, Boolean>> items = new ArrayList<>(27);
-    private final Set<String> leftClick = Stream.of("Kaian Scroll", "Fairy Powder", "Stolen Goods", "Golden Avia Feather", "Fiery Aura", "Windy Aura", "Watery Aura", "Sought-After Ore", "Ancient Currency", "Glimmering Coin", "Doom Stone", "Lunar Charm", "Nose Ring", "Decaying Heart", "Stolen Pearls", "Antique Metal", "Luxroot Cuttings", "Emerald").collect(Collectors.toSet());
+    private Set<String> leftClick = Stream.of("Kaian Scroll", "Fairy Powder", "Stolen Goods", "Golden Avia Feather", "Fiery Aura", "Windy Aura", "Watery Aura", "Sought-After Ore", "Ancient Currency", "Glimmering Coin", "Doom Stone", "Lunar Charm", "Nose Ring", "Decaying Heart", "Stolen Pearls", "Antique Metal", "Luxroot Cuttings", "Emerald").collect(Collectors.toSet());
     private final Set<String> shiftClick = Stream.of("Fire Powder IV", "Air Powder IV", "Thunder Powder IV", "Water Powder IV", "Earth Powder IV").collect(Collectors.toSet());
 
     @SubscribeEvent
@@ -58,5 +60,15 @@ public class ChestLooter {
                 lastClickTime = System.currentTimeMillis();
             }
         }
+    }
+
+    @SubscribeEvent
+    public void onSecond(SecondEvent event) {
+        Set<String> mainStream = Stream.of("Kaian Scroll", "Fairy Powder", "Stolen Goods", "Golden Avia Feather", "Fiery Aura", "Windy Aura", "Watery Aura", "Sought-After Ore", "Ancient Currency", "Glimmering Coin", "Doom Stone", "Lunar Charm", "Nose Ring", "Decaying Heart", "Stolen Pearls", "Antique Metal", "Luxroot Cuttings", "Emerald").collect(Collectors.toSet());
+        if(Main.configFile.doChestLootFilter) {
+            String[] split = Main.configFile.chestLootFilter.split(",");
+            mainStream.addAll(Stream.of(split).collect(Collectors.toSet()));
+        }
+        leftClick = mainStream;
     }
 }

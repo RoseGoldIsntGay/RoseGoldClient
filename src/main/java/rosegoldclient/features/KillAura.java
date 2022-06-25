@@ -1,10 +1,14 @@
 package rosegoldclient.features;
 
+import gg.essential.api.utils.Multithreading;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.boss.EntityWither;
 import net.minecraft.entity.passive.*;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.network.play.client.CPacketAnimation;
+import net.minecraft.network.play.client.CPacketEntityAction;
+import net.minecraft.network.play.client.CPacketPlayerTryUseItem;
 import net.minecraft.util.EnumHand;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
@@ -25,6 +29,8 @@ import java.util.stream.Collectors;
 public class KillAura {
 
     public static EntityLivingBase target;
+    private static final CPacketPlayerTryUseItem use = new CPacketPlayerTryUseItem(EnumHand.MAIN_HAND);
+    private static final CPacketAnimation swing = new CPacketAnimation(EnumHand.MAIN_HAND);
 
     @SubscribeEvent
     public void onTick(TickEndEvent event) {
@@ -55,16 +61,17 @@ public class KillAura {
         if(target == null) return;
         if(Main.mc.player.ticksExisted % 2 != 0) return;
         if(SpellCaster.packetList.size() != 0) return;
-        switch (Main.configFile.killAuraType) {
-            case 0: //melee
-                Main.mc.player.swingArm(EnumHand.MAIN_HAND);
-                Main.mc.playerController.attackEntity(Main.mc.player, target);
-                break;
-            case 1: //bow
-                Main.mc.playerController.processRightClick(Main.mc.player, Main.mc.world, EnumHand.MAIN_HAND);
-                break;
-            default:
-                Main.mc.player.swingArm(EnumHand.MAIN_HAND);
+        if(AutoSneak.abilityReady) {
+            Main.mc.getConnection().getNetworkManager().sendPacket(new CPacketEntityAction(Main.mc.player, CPacketEntityAction.Action.START_SNEAKING));
+            attack();
+            Multithreading.runAsync(() -> {
+                try {
+                    Thread.sleep(100);
+                    Main.mc.getConnection().getNetworkManager().sendPacket(new CPacketEntityAction(Main.mc.player, CPacketEntityAction.Action.STOP_SNEAKING));
+                } catch (Exception ignored) {}
+            });
+        } else {
+            attack();
         }
     }
 
@@ -76,8 +83,16 @@ public class KillAura {
         }
     }
 
+    private static void attack() {
+        if (Main.configFile.killAuraType == 1) { //bow
+            Main.mc.getConnection().getNetworkManager().sendPacket(use);
+        } else {
+            Main.mc.getConnection().getNetworkManager().sendPacket(swing);
+        }
+    }
+
     private static EntityLivingBase getEntity() {
-        if(Main.mc.currentScreen != null || Main.mc.world == null) return null;
+        if(Main.mc.world == null) return null;
         float range = 4F;
         boolean throughWalls = true;
         switch (Main.configFile.killAuraType) {
@@ -115,6 +130,7 @@ public class KillAura {
         if(Main.configFile.killAuraCustomNames && !entity.hasCustomName()) {
             return false;
         }
+        if(entity.getCustomNameTag().contains(" By ")) return false;
         if(Main.configFile.killAuraFilter) {
             if(Main.configFile.killAuraFilterBlacklist) {
                 for (String search : KillAuraFilter.KASettings) {

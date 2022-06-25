@@ -11,10 +11,12 @@ import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import rosegoldclient.Main;
-import rosegoldclient.events.*;
+import rosegoldclient.events.PlayerMoveEvent;
+import rosegoldclient.events.ScreenClosedEvent;
+import rosegoldclient.events.SecondEvent;
+import rosegoldclient.events.TickEndEvent;
 import rosegoldclient.utils.RenderUtils;
 import rosegoldclient.utils.RotationUtils;
-import rosegoldclient.utils.Utils;
 
 import java.awt.*;
 import java.util.HashSet;

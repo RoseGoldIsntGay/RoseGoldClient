@@ -16,12 +16,25 @@ public class ReflectionUtils {
         return false;
     }
 
-    public static Object field(Object object, String name) {
+    public static Object getFieldByName(final Class clazz, final String name, final Object object) {
         try {
-            Field field = object.getClass().getDeclaredField(name);
+            final Field field = clazz.getDeclaredField(name);
             field.setAccessible(true);
             return field.get(object);
-        } catch(Exception ignored) {}
-        return null;
+        }
+        catch (Exception ex) {
+            return null;
+        }
+    }
+
+    public static Object getFieldByName(final Object obj, final String name) {
+        try {
+            final Field field = obj.getClass().getDeclaredField(name);
+            field.setAccessible(true);
+            return field.get(obj);
+        }
+        catch (Exception ex) {
+            return null;
+        }
     }
 }

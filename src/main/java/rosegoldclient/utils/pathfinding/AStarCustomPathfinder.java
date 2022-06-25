@@ -3,9 +3,11 @@ package rosegoldclient.utils.pathfinding;
 import net.minecraft.block.*;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import rosegoldclient.Main;
+import rosegoldclient.features.Pathfinding;
 import rosegoldclient.utils.Utils;
 import rosegoldclient.utils.VecUtils;
 
@@ -39,7 +41,7 @@ public class AStarCustomPathfinder {
     }
 
     public void compute() {
-        compute(128, 4);
+        compute(1000, 4);
     }
 
     public void compute(final int loops, final int depth) {
@@ -65,18 +67,18 @@ public class AStarCustomPathfinder {
 
                 for (Vec3d direction : flatCardinalDirections) {
                     Vec3d loc = VecUtils.ceilVec(hub.getLoc().add(direction));
-                    if (checkPositionValidity(loc, true, 1)) {
-                        if (addHub(hub, loc, 0.0)) {
+                    if (checkPositionValidity(loc, true)) {
+                        if (addHub(hub, loc, 0)) {
                             break search;
                         }
                     }
                 }
 
-                for (final Vec3d direction : flatCardinalDirections) {
-                    for (int k = 1; k < 256; k++) {
-                        Vec3d loc = VecUtils.ceilVec(hub.getLoc().add(direction).addVector(0, k, 0));
-                        if (checkPositionValidity(loc, true, 1) && checkPositionValidity(hub.getLoc().addVector(0, 1, 0), false, k)) {
-                            if (addHub(hub, loc, 0.0)) {
+                if(checkPositionValidity(hub.getLoc().addVector(0, 1, 0), false)) {
+                    for (Vec3d direction : flatCardinalDirections) {
+                        Vec3d loc = VecUtils.ceilVec(hub.getLoc().add(direction).addVector(0, 1, 0));
+                        if (checkPositionValidity(loc, true)) {
+                            if (addHub(hub, loc, 0)) {
                                 break search;
                             }
                         }
@@ -84,12 +86,17 @@ public class AStarCustomPathfinder {
                 }
 
                 for (Vec3d direction : flatCardinalDirections) {
-                    for (int k = 1; k < 256; k++) {
-                        Vec3d loc = VecUtils.ceilVec(hub.getLoc().add(direction).addVector(0, -k, 0));
-                        if (checkPositionValidity(loc, true, 1) && checkPositionValidity(loc.addVector(0, 1, 0), false, 1)) {
-                            if (addHub(hub, loc, 0.0)) {
-                                break search;
+                    for(int k = 0; k < 256; k++) {
+                        Vec3d forward = VecUtils.ceilVec(hub.getLoc().add(direction).addVector(0, -k, 0));
+                        if (checkPositionValidity(forward, false)) {
+                            Vec3d loc = VecUtils.ceilVec(hub.getLoc().add(direction).addVector(0, -(k + 1), 0));
+                            if (checkPositionValidity(loc, true)) {
+                                if (addHub(hub, loc, 0)) {
+                                    break search;
+                                }
                             }
+                        } else {
+                            break;
                         }
                     }
                 }
@@ -101,18 +108,17 @@ public class AStarCustomPathfinder {
         }
     }
 
-    public static boolean checkPositionValidity(Vec3d loc, boolean checkGround, int height) {
-        return checkPositionValidity((int) loc.x, (int) loc.y, (int) loc.z, checkGround, height);
+    public static boolean checkPositionValidity(Vec3d loc, boolean checkGround) {
+        return checkPositionValidity((int) loc.x, (int) loc.y, (int) loc.z, checkGround);
     }
 
-    public static boolean checkPositionValidity(int x, int y, int z, boolean checkGround, int height) {
+    public static boolean checkPositionValidity(int x, int y, int z, boolean checkGround) {
         BlockPos block1 = new BlockPos(x, y, z);
-        if(isBlockSolid(block1)) return false;
+        if (isBlockSolid(block1)) return false;
 
-        for(int i = 1; i <= height; i++) {
-            BlockPos block2 = new BlockPos(x, y + i, z);
-            if(isBlockSolid(block2)) return false;
-        }
+        BlockPos block2 = new BlockPos(x, y + 1, z);
+        if (isBlockSolid(block2)) return false;
+
         if (!checkGround) return true;
 
         BlockPos block3 = new BlockPos(x, y - 1, z);
@@ -129,10 +135,12 @@ public class AStarCustomPathfinder {
         return false;
     }
 
-    private static boolean isSafeToWalkOn(final BlockPos block) {
-        final IBlockState bs = Main.mc.world.getBlockState(block);
-        if (bs != null) {
+    private static boolean isSafeToWalkOn(BlockPos block) {
+        IBlockState bs = Main.mc.world.getBlockState(block);
+        IBlockState above = Main.mc.world.getBlockState(block.add(0, 1, 0));
+        if (bs != null && above != null) {
             final Block b = bs.getBlock();
+            if(above.getBlock() instanceof BlockLiquid) return false;
             return !(b instanceof BlockFence) && !(b instanceof BlockWall);
         }
         return false;
