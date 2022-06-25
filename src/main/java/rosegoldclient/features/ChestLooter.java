@@ -22,7 +22,7 @@ import rosegoldclient.Main;
 public class ChestLooter {
 	private long lastClickTime = 0L;
 	private final List<Map.Entry<Slot, Boolean>> items = new ArrayList<>(27);
-	private final Set<String> leftClick = rosegoldclient.utils.StringUtils.toSet(Config.INSTANCE.autoLootedItems);
+	private Set<String> leftClick;
 	@SubscribeEvent
 	public void onGuiOpen(GuiOpenEvent event) {
 		items.clear();
@@ -31,11 +31,11 @@ public class ChestLooter {
 	@SubscribeEvent
 	public void onGuiDraw(GuiScreenEvent.BackgroundDrawnEvent event) {
 		
-		leftClick.addAll(rosegoldclient.utils.StringUtils.toSet(Config.INSTANCE.autoLootedItems)); // Update the looted items with the config just incase they're out of sync.
 		
 		ContainerChest container;
 		if (!Main.configFile.chestLoot || !(event.getGui() instanceof GuiChest))
 			return;
+		this.leftClick = rosegoldclient.utils.StringUtils.toSet(Config.INSTANCE.autoLootedItems);
 		if (((GuiChest) event.getGui()).inventorySlots instanceof ContainerChest
 				&& StringUtils
 						.stripControlCodes((container = (ContainerChest) ((GuiChest) event.getGui()).inventorySlots)
