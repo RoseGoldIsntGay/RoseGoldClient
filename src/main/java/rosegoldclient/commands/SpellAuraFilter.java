@@ -1,18 +1,19 @@
 package rosegoldclient.commands;
 
-import com.google.gson.Gson;
-import net.minecraft.command.CommandBase;
-import net.minecraft.command.CommandException;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.server.MinecraftServer;
-import rosegoldclient.utils.Utils;
-
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+
+import com.google.gson.Gson;
+
+import net.minecraft.command.CommandBase;
+import net.minecraft.command.CommandException;
+import net.minecraft.command.ICommandSender;
+import net.minecraft.server.MinecraftServer;
+import rosegoldclient.utils.Utils;
 
 public class SpellAuraFilter extends CommandBase {
 

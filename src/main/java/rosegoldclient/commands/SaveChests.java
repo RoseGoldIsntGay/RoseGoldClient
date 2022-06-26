@@ -1,5 +1,9 @@
 package rosegoldclient.commands;
 
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -7,11 +11,6 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import rosegoldclient.features.WynncraftChestESP;
 import rosegoldclient.utils.Utils;
-
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Iterator;
 
 public class SaveChests extends CommandBase {
 

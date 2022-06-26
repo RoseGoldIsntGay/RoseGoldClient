@@ -1,18 +1,31 @@
 package rosegoldclient.utils.pathfinding;
 
-import net.minecraft.block.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockCactus;
+import net.minecraft.block.BlockChest;
+import net.minecraft.block.BlockEnderChest;
+import net.minecraft.block.BlockFence;
+import net.minecraft.block.BlockGlass;
+import net.minecraft.block.BlockLiquid;
+import net.minecraft.block.BlockPane;
+import net.minecraft.block.BlockPistonBase;
+import net.minecraft.block.BlockPistonExtension;
+import net.minecraft.block.BlockPistonMoving;
+import net.minecraft.block.BlockSkull;
+import net.minecraft.block.BlockSlab;
+import net.minecraft.block.BlockStainedGlass;
+import net.minecraft.block.BlockStairs;
+import net.minecraft.block.BlockTrapDoor;
+import net.minecraft.block.BlockWall;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
-import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import rosegoldclient.Main;
-import rosegoldclient.features.Pathfinding;
 import rosegoldclient.utils.Utils;
 import rosegoldclient.utils.VecUtils;
-
-import java.util.ArrayList;
-import java.util.Comparator;
 
 public class AStarCustomPathfinder {
     private Vec3d startVec3;

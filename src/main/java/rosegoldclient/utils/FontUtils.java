@@ -1,9 +1,9 @@
 package rosegoldclient.utils;
 
+import java.awt.Color;
+
 import net.minecraft.client.renderer.GlStateManager;
 import rosegoldclient.Main;
-
-import java.awt.*;
 
 public class FontUtils {
     public static String enforceWidth(String text, int width) {

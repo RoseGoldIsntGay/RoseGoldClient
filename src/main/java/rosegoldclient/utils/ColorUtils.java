@@ -1,6 +1,6 @@
 package rosegoldclient.utils;
 
-import java.awt.*;
+import java.awt.Color;
 
 public class ColorUtils {
     public static Color MENU_BG;

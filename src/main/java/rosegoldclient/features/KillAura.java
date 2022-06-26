@@ -1,10 +1,17 @@
 package rosegoldclient.features;
 
+import java.awt.Color;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import gg.essential.api.utils.Multithreading;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.boss.EntityWither;
-import net.minecraft.entity.passive.*;
+import net.minecraft.entity.passive.EntityBat;
+import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.play.client.CPacketAnimation;
 import net.minecraft.network.play.client.CPacketEntityAction;
@@ -19,12 +26,6 @@ import rosegoldclient.events.PlayerMoveEvent;
 import rosegoldclient.events.TickEndEvent;
 import rosegoldclient.utils.RenderUtils;
 import rosegoldclient.utils.RotationUtils;
-
-import java.awt.*;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class KillAura {
 

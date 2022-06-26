@@ -1,14 +1,14 @@
 package rosegoldclient.commands;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;
 import rosegoldclient.Main;
 import rosegoldclient.utils.Utils;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class ChangeVelocity extends CommandBase {
     @Override
@@ -30,7 +30,7 @@ public class ChangeVelocity extends CommandBase {
 
     @Override
     public String getUsage(ICommandSender sender) {
-        return "/" + getName() + " [x] [y] [z";
+        return "/" + getName() + " [x] [y] [z]";
     }
 
     @Override

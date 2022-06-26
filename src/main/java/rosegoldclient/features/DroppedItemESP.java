@@ -1,9 +1,10 @@
 package rosegoldclient.features;
 
+import java.util.HashMap;
+import java.util.HashSet;
+
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.init.SoundEvents;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
@@ -14,9 +15,6 @@ import rosegoldclient.events.TickEndEvent;
 import rosegoldclient.utils.FontUtils;
 import rosegoldclient.utils.RenderUtils;
 import rosegoldclient.utils.WynncraftItem;
-
-import java.util.HashMap;
-import java.util.HashSet;
 
 public class DroppedItemESP {
     private static final HashMap<EntityItem, WynncraftItem> highlightedItems = new HashMap<>();

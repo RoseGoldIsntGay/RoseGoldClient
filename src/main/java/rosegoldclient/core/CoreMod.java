@@ -1,13 +1,15 @@
 package rosegoldclient.core;
 
-import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
+import java.util.Map;
+
+import javax.annotation.Nullable;
+
 import org.spongepowered.asm.launch.MixinBootstrap;
 import org.spongepowered.asm.mixin.MixinEnvironment;
 import org.spongepowered.asm.mixin.Mixins;
-import rosegoldclient.Main;
 
-import javax.annotation.Nullable;
-import java.util.Map;
+import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
+import rosegoldclient.Main;
 
 public class CoreMod implements IFMLLoadingPlugin {
     @Override

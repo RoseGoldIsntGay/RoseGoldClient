@@ -1,5 +1,8 @@
 package rosegoldclient.features;
 
+import java.awt.Color;
+import java.util.HashSet;
+
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -9,9 +12,6 @@ import rosegoldclient.events.SettingChangeEvent;
 import rosegoldclient.events.TickEndEvent;
 import rosegoldclient.utils.RenderUtils;
 import rosegoldclient.utils.Utils;
-
-import java.awt.*;
-import java.util.HashSet;
 
 public class WynncraftChestESP {
     public static HashSet<BlockPos> chests = new HashSet<>();

@@ -1,5 +1,12 @@
 package rosegoldclient.features;
 
+import java.awt.Color;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.boss.EntityWither;
@@ -12,14 +19,11 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import rosegoldclient.Main;
 import rosegoldclient.commands.SpellAuraFilter;
-import rosegoldclient.events.*;
+import rosegoldclient.events.KeybindEvent;
+import rosegoldclient.events.PlayerMoveEvent;
+import rosegoldclient.events.TickEndEvent;
 import rosegoldclient.utils.RenderUtils;
 import rosegoldclient.utils.RotationUtils;
-
-import java.awt.*;
-import java.util.*;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class SpellAura {
 

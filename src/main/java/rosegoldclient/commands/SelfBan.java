@@ -1,13 +1,13 @@
 package rosegoldclient.commands;
 
+import java.util.Random;
+
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.TextComponentString;
 import rosegoldclient.Main;
-
-import java.util.Random;
 
 public class SelfBan extends CommandBase {
     @Override

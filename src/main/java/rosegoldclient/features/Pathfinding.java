@@ -1,11 +1,13 @@
 package rosegoldclient.features;
 
-import gg.essential.api.utils.Multithreading;
+import java.awt.Color;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.stream.Collectors;
+
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockCrops;
-import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
@@ -13,14 +15,13 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import rosegoldclient.Main;
 import rosegoldclient.events.MillisecondEvent;
 import rosegoldclient.events.TickEndEvent;
-import rosegoldclient.utils.*;
+import rosegoldclient.utils.CheetoRotation;
+import rosegoldclient.utils.ColorUtils;
+import rosegoldclient.utils.RenderUtils;
+import rosegoldclient.utils.Rotation;
+import rosegoldclient.utils.TimeHelper;
+import rosegoldclient.utils.VecUtils;
 import rosegoldclient.utils.pathfinding.Pathfinder;
-
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.stream.Collectors;
 
 public class Pathfinding {
 

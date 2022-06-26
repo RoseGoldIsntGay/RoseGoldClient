@@ -1,5 +1,13 @@
 package rosegoldclient.features;
 
+import java.awt.Color;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import gg.essential.api.utils.Multithreading;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityArmorStand;
@@ -14,12 +22,6 @@ import rosegoldclient.events.RenderLivingEntityEvent;
 import rosegoldclient.events.SecondEvent;
 import rosegoldclient.utils.FontUtils;
 import rosegoldclient.utils.RenderUtils;
-
-import java.awt.*;
-import java.util.*;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class RareMobESP {
     private static final HashMap<Entity, String> highlightedEntities = new HashMap<>();
