@@ -1,5 +1,10 @@
 package rosegoldclient.features;
 
+import java.awt.Color;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityArmorStand;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
@@ -9,11 +14,6 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 import rosegoldclient.Main;
 import rosegoldclient.events.RenderLivingEntityEvent;
 import rosegoldclient.utils.RenderUtils;
-
-import java.awt.*;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 
 public class EntityESP {
     private static final HashMap<Entity, String> highlightedEntities = new HashMap<>();

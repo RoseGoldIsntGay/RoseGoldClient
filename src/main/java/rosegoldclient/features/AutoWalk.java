@@ -1,5 +1,8 @@
 package rosegoldclient.features;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import gg.essential.api.utils.Multithreading;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.util.math.BlockPos;
@@ -8,13 +11,14 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import rosegoldclient.Main;
-import rosegoldclient.events.KeybindEvent;
 import rosegoldclient.events.TickEndEvent;
-import rosegoldclient.utils.*;
+import rosegoldclient.utils.CheetoRotation;
+import rosegoldclient.utils.ColorUtils;
+import rosegoldclient.utils.Point;
+import rosegoldclient.utils.RenderUtils;
+import rosegoldclient.utils.Rotation;
+import rosegoldclient.utils.VecUtils;
 import rosegoldclient.utils.pathfinding.Pathfinder;
-
-import java.util.ArrayList;
-import java.util.HashMap;
 
 public class AutoWalk {
 

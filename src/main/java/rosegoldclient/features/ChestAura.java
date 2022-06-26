@@ -1,5 +1,8 @@
 package rosegoldclient.features;
 
+import java.awt.Color;
+import java.util.HashSet;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockChest;
 import net.minecraft.util.EnumFacing;
@@ -17,9 +20,6 @@ import rosegoldclient.events.SecondEvent;
 import rosegoldclient.events.TickEndEvent;
 import rosegoldclient.utils.RenderUtils;
 import rosegoldclient.utils.RotationUtils;
-
-import java.awt.*;
-import java.util.HashSet;
 
 public class ChestAura {
     private static final HashSet<BlockPos> allChests = new HashSet<>();

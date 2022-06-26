@@ -1,7 +1,17 @@
 package rosegoldclient.commands;
 
+import java.io.File;
+import java.io.Reader;
+import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -11,15 +21,6 @@ import rosegoldclient.Main;
 import rosegoldclient.features.AutoWalk;
 import rosegoldclient.utils.Point;
 import rosegoldclient.utils.Utils;
-
-import java.io.File;
-import java.io.Reader;
-import java.lang.reflect.Type;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
 
 public class WalkPoint extends CommandBase {
 

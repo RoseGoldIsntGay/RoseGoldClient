@@ -1,5 +1,7 @@
 package rosegoldclient.features;
 
+import java.util.HashSet;
+
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -7,8 +9,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
 import rosegoldclient.Main;
 import rosegoldclient.events.TickEndEvent;
-
-import java.util.HashSet;
 
 public class Phase {
 

@@ -1,21 +1,20 @@
 package rosegoldclient.features;
 
+import java.util.ArrayList;
+
+import org.lwjgl.input.Keyboard;
+
 import gg.essential.api.utils.Multithreading;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.client.CPacketAnimation;
 import net.minecraft.network.play.client.CPacketEntityAction;
-import net.minecraft.network.play.client.CPacketPlayer;
 import net.minecraft.network.play.client.CPacketPlayerTryUseItem;
 import net.minecraft.util.EnumHand;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
-import org.lwjgl.input.Keyboard;
 import rosegoldclient.Main;
 import rosegoldclient.events.TickEndEvent;
-import rosegoldclient.utils.Utils;
-
-import java.util.ArrayList;
 
 public class SpellCaster {
 

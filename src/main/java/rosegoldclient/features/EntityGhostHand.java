@@ -1,5 +1,9 @@
 package rosegoldclient.features;
 
+import java.awt.Color;
+import java.util.ArrayList;
+import java.util.List;
+
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.boss.EntityWither;
@@ -15,10 +19,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import rosegoldclient.Main;
 import rosegoldclient.events.TickEndEvent;
 import rosegoldclient.utils.RenderUtils;
-
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
 
 public class EntityGhostHand {
 

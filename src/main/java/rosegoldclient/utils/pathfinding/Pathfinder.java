@@ -1,9 +1,9 @@
 package rosegoldclient.utils.pathfinding;
 
+import java.util.ArrayList;
+
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-
-import java.util.ArrayList;
 
 public class Pathfinder {
     private static AStarCustomPathfinder pathfinder;

@@ -1,6 +1,18 @@
 package rosegoldclient.features;
 
+import java.awt.Color;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import com.google.gson.Gson;
+
 import gg.essential.api.utils.Multithreading;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -20,19 +32,13 @@ import rosegoldclient.Main;
 import rosegoldclient.events.PlayerMoveEvent;
 import rosegoldclient.events.SecondEvent;
 import rosegoldclient.events.TickEndEvent;
-import rosegoldclient.utils.*;
+import rosegoldclient.utils.ColorUtils;
+import rosegoldclient.utils.FontUtils;
+import rosegoldclient.utils.RenderUtils;
+import rosegoldclient.utils.RotationUtils;
+import rosegoldclient.utils.Utils;
+import rosegoldclient.utils.VecUtils;
 import rosegoldclient.utils.pathfinding.Pathfinder;
-
-import java.awt.*;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class AutoProfessions {
 

@@ -1,8 +1,8 @@
 package rosegoldclient.events;
 
-import net.minecraftforge.fml.common.eventhandler.Event;
-
 import java.time.LocalDateTime;
+
+import net.minecraftforge.fml.common.eventhandler.Event;
 
 public class MillisecondEvent extends Event {
     public LocalDateTime dateTime;

@@ -1,13 +1,13 @@
 package rosegoldclient.features;
 
+import java.lang.reflect.Field;
+
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.SPacketEntityVelocity;
 import rosegoldclient.Main;
-
-import java.lang.reflect.Field;
 
 public class Velocity extends ChannelDuplexHandler {
     @Override

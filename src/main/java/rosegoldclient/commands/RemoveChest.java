@@ -1,5 +1,7 @@
 package rosegoldclient.commands;
 
+import java.util.ArrayList;
+
 import net.minecraft.block.Block;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
@@ -11,8 +13,6 @@ import net.minecraft.util.math.Vec3i;
 import rosegoldclient.Main;
 import rosegoldclient.features.WynncraftChestESP;
 import rosegoldclient.utils.Utils;
-
-import java.util.ArrayList;
 
 public class RemoveChest extends CommandBase {
     @Override

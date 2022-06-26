@@ -6,7 +6,6 @@ import net.minecraft.util.EnumHand;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import rosegoldclient.Main;
 import rosegoldclient.events.TickEndEvent;
-import rosegoldclient.utils.Utils;
 
 public class AutoHeal {
 

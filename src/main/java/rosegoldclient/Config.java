@@ -1,11 +1,16 @@
 package rosegoldclient;
 
-import gg.essential.vigilance.Vigilant;
-import gg.essential.vigilance.data.*;
-import org.jetbrains.annotations.NotNull;
-
 import java.io.File;
 import java.util.Comparator;
+
+import org.jetbrains.annotations.NotNull;
+
+import gg.essential.vigilance.Vigilant;
+import gg.essential.vigilance.data.Category;
+import gg.essential.vigilance.data.JVMAnnotationPropertyCollector;
+import gg.essential.vigilance.data.Property;
+import gg.essential.vigilance.data.PropertyType;
+import gg.essential.vigilance.data.SortingBehavior;
 
 public class Config extends Vigilant {
 

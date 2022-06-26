@@ -1,10 +1,9 @@
 package rosegoldclient.mixins;
 
-import akka.actor.AbstractActorContext;
-import net.minecraft.client.entity.AbstractClientPlayer;
-import net.minecraft.client.entity.EntityPlayerSP;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
+
+import net.minecraft.client.entity.EntityPlayerSP;
 
 @Mixin(EntityPlayerSP.class)
 public interface PlayerSPAccessor {

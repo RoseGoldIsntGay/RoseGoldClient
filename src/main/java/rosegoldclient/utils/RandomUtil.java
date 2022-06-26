@@ -1,8 +1,8 @@
 package rosegoldclient.utils;
 
-import net.minecraft.util.math.Vec3d;
-
 import java.util.Random;
+
+import net.minecraft.util.math.Vec3d;
 
 public class RandomUtil {
     private static Random rand;

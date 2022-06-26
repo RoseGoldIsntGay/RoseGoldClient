@@ -1,12 +1,13 @@
 package rosegoldclient.commands;
 
+import org.jetbrains.annotations.NotNull;
+
 import gg.essential.api.utils.Multithreading;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
-import org.jetbrains.annotations.NotNull;
 import rosegoldclient.Main;
 import rosegoldclient.features.Pathfinding;
 import rosegoldclient.utils.VecUtils;

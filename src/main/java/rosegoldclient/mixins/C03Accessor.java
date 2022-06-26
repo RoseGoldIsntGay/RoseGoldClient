@@ -1,8 +1,9 @@
 package rosegoldclient.mixins;
 
-import net.minecraft.network.play.client.CPacketPlayer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
+
+import net.minecraft.network.play.client.CPacketPlayer;
 
 @Mixin(CPacketPlayer.class)
 public interface C03Accessor {

@@ -1,5 +1,10 @@
 package rosegoldclient.features;
 
+import java.awt.Color;
+import java.util.List;
+
+import org.lwjgl.opengl.GL11;
+
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.gui.inventory.GuiInventory;
@@ -10,13 +15,11 @@ import net.minecraft.network.play.client.CPacketUseEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import org.lwjgl.opengl.GL11;
 import rosegoldclient.Main;
 import rosegoldclient.events.PacketSentEvent;
-import rosegoldclient.utils.*;
-
-import java.awt.*;
-import java.util.List;
+import rosegoldclient.utils.Fonts;
+import rosegoldclient.utils.MilliTimer;
+import rosegoldclient.utils.RenderUtils;
 
 public class TargetHUD {
 
