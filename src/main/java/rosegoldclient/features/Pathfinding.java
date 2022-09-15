@@ -1,17 +1,12 @@
 package rosegoldclient.features;
 
-import gg.essential.api.utils.Multithreading;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockCrops;
-import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import rosegoldclient.Main;
-import rosegoldclient.events.MillisecondEvent;
 import rosegoldclient.events.TickEndEvent;
 import rosegoldclient.utils.*;
 import rosegoldclient.utils.pathfinding.Pathfinder;
@@ -24,27 +19,11 @@ import java.util.stream.Collectors;
 
 public class Pathfinding {
 
-    private static long lastTeleportTime = 0;
     private static int stuckTicks = 0;
     private static BlockPos oldPos;
     private static BlockPos curPos;
-    private static TimeHelper unstucker;
     public static boolean walk = false;
     public static HashSet<BlockPos> temp = new HashSet<>();
-
-    @SubscribeEvent
-    public void onMillisecond(MillisecondEvent event) {
-        if(walk) return;
-        if (System.currentTimeMillis() - lastTeleportTime < (long) Main.configFile.cursorTeleportPathfindSpeed - 1) return;
-        if (Pathfinder.hasPath()) {
-            if (Pathfinder.hasNext()) {
-                Vec3d next = Pathfinder.getNext();
-                tpToBlock(new BlockPos(next));
-                lastTeleportTime = System.currentTimeMillis();
-            }
-            Pathfinder.goNext();
-        }
-    }
 
     @SubscribeEvent
     public void onTick(TickEndEvent event) {
@@ -152,22 +131,19 @@ public class Pathfinding {
         Vec3d directionTop = CheetoRotation.getLook(topPoint);
         directionTop = VecUtils.scaleVec(directionTop, 0.5f);
         for (int i = 0; i < Math.round(topPoint.distanceTo(Main.mc.player.getPositionEyes(1))) * 2; i++) {
-            if(Main.mc.world.getBlockState(new BlockPos(topPos)).getBlock().getCollisionBoundingBox(
-                    Main.mc.world.getBlockState(new BlockPos(topPos)),
+            if(Main.mc.world.getBlockState(new BlockPos(topPos)).getCollisionBoundingBox(
                     Main.mc.world,
                     new BlockPos(topPos)
             ) != Block.NULL_AABB) return false;
             topPos = topPos.add(directionTop);
 
-            if(Main.mc.world.getBlockState(new BlockPos(botPos)).getBlock().getCollisionBoundingBox(
-                    Main.mc.world.getBlockState(new BlockPos(botPos)),
+            if(Main.mc.world.getBlockState(new BlockPos(botPos)).getCollisionBoundingBox(
                     Main.mc.world,
                     new BlockPos(botPos)
             ) != Block.NULL_AABB) return false;
             botPos = botPos.add(directionTop);
 
-            if(Main.mc.world.getBlockState(new BlockPos(underPos)).getBlock().getCollisionBoundingBox(
-                    Main.mc.world.getBlockState(new BlockPos(underPos)),
+            if(Main.mc.world.getBlockState(new BlockPos(underPos)).getCollisionBoundingBox(
                     Main.mc.world,
                     new BlockPos(underPos)
             ) == Block.NULL_AABB) return false;
@@ -198,15 +174,4 @@ public class Pathfinding {
         KeyBinding.setKeyBindState(Main.mc.gameSettings.keyBindJump.getKeyCode(), false);
     }
 
-    private static void tpToBlock(BlockPos blockPos) {
-        Main.mc.player.setPosition(blockPos.getX() + 0.5, blockPos.getY(), blockPos.getZ() + 0.5);
-        switch (Main.configFile.cursorTeleportResetVelocity) {
-            case 1:
-                Main.mc.player.setVelocity(0, Main.mc.player.motionY, 0);
-            case 2:
-                Main.mc.player.setVelocity(Main.mc.player.motionX, 0, Main.mc.player.motionZ);
-            case 3:
-                Main.mc.player.setVelocity(Main.mc.player.motionX, Main.mc.player.motionY, Main.mc.player.motionZ);
-        }
-    }
 }

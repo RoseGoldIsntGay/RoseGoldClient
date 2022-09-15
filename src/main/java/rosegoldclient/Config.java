@@ -259,17 +259,9 @@ public class Config extends Vigilant {
             category = "Movement", subcategory = "No Fall")
     public boolean noFall = false;
 
-    @Property(type = PropertyType.SWITCH, name = "Cursor Teleport", description = "Hypixel Skyblock AOTE",
+    @Property(type = PropertyType.SWITCH, name = "Cursor Teleport", description = "Hypixel Skyblock AOTV, Shift to teleport onto the block, into otherwise",
             category = "Movement", subcategory = "Cursor Teleport")
     public boolean cursorTeleport = false;
-
-        @Property(type = PropertyType.SELECTOR, name = "Pathfind", description = "Pathfind to destination",
-                category = "Movement", subcategory = "Cursor Teleport", options = {"While sneak held", "Always", "Never"})
-        public int cursorTeleportPathfind = 0;
-
-        @Property(type = PropertyType.SLIDER, name = "Pathfind Movement Speed", description = "Teleports per second",
-                category = "Movement", subcategory = "Cursor Teleport", min = 1, max = 100)
-        public int cursorTeleportPathfindSpeed = 1;
 
         @Property(type = PropertyType.SLIDER, name = "Cursor Teleport Range",
                 category = "Movement", subcategory = "Cursor Teleport", max = 100)

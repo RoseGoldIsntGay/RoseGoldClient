@@ -28,9 +28,7 @@ public class RGTP extends CommandBase {
         if(args.length == 3) {
             double[] newArgs = new double[3];
             for(int i = 0; i < 3; i++) {
-                if(args[i].startsWith("~")) {
-                    newArgs[i] = Double.parseDouble(args[i].replace("~", ""));
-                }
+                newArgs[i] = Integer.parseInt(args[i]);
             }
             Main.mc.player.setPosition(newArgs[0] + 0.5D, newArgs[1], newArgs[2] + 0.5D);
         } else {

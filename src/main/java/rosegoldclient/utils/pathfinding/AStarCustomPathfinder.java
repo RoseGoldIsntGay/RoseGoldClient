@@ -44,7 +44,7 @@ public class AStarCustomPathfinder {
         compute(1000, 4);
     }
 
-    public void compute(final int loops, final int depth) {
+    public void compute(int loops, int depth) {
         path.clear();
         hubsToWork.clear();
         ArrayList<Vec3d> initPath = new ArrayList<>();
@@ -57,7 +57,7 @@ public class AStarCustomPathfinder {
             if (hubsToWork.size() == 0) {
                 break;
             }
-            for (final Hub hub : new ArrayList<>(hubsToWork)) {
+            for (Hub hub : new ArrayList<>(hubsToWork)) {
                 if (++j > depth) {
                     break;
                 }
@@ -77,7 +77,7 @@ public class AStarCustomPathfinder {
                 if(checkPositionValidity(hub.getLoc().addVector(0, 1, 0), false)) {
                     for (Vec3d direction : flatCardinalDirections) {
                         Vec3d loc = VecUtils.ceilVec(hub.getLoc().add(direction).addVector(0, 1, 0));
-                        if (checkPositionValidity(loc, true)) {
+                        if (checkPositionValidity(loc, true) && fenceCheck(loc)) {
                             if (addHub(hub, loc, 0)) {
                                 break search;
                             }
@@ -108,6 +108,15 @@ public class AStarCustomPathfinder {
         }
     }
 
+    public static boolean fenceCheck(Vec3d loc) {
+        return fenceCheck((int) loc.x, (int) loc.y, (int) loc.z);
+    }
+
+    public static boolean fenceCheck(int x, int y, int z) {
+        BlockPos block1 = new BlockPos(x, y, z);
+        return !isFence(block1);
+    }
+
     public static boolean checkPositionValidity(Vec3d loc, boolean checkGround) {
         return checkPositionValidity((int) loc.x, (int) loc.y, (int) loc.z, checkGround);
     }
@@ -126,33 +135,33 @@ public class AStarCustomPathfinder {
         return isBlockSolid(block3) && isSafeToWalkOn(block3);
     }
 
-    private static boolean isBlockSolid(final BlockPos block) {
-        final IBlockState bs = Main.mc.world.getBlockState(block);
-        if (bs != null) {
-            final Block b = bs.getBlock();
-            return Main.mc.world.isBlockFullCube(block) || b instanceof BlockSlab || b instanceof BlockStairs || b instanceof BlockCactus || b instanceof BlockChest || b instanceof BlockEnderChest || b instanceof BlockSkull || b instanceof BlockPane || b instanceof BlockFence || b instanceof BlockWall || b instanceof BlockGlass || b instanceof BlockPistonBase || b instanceof BlockPistonExtension || b instanceof BlockPistonMoving || b instanceof BlockStainedGlass || b instanceof BlockTrapDoor;
-        }
-        return false;
+    private static boolean isFence(BlockPos block) {
+        IBlockState bs = Main.mc.world.getBlockState(block);
+        Block b = bs.getBlock();
+        return b instanceof BlockFence || b instanceof BlockWall;
+    }
+
+    private static boolean isBlockSolid(BlockPos block) {
+        IBlockState bs = Main.mc.world.getBlockState(block);
+        Block b = bs.getBlock();
+        return Main.mc.world.isBlockFullCube(block) || b instanceof BlockSlab || b instanceof BlockStairs || b instanceof BlockCactus || b instanceof BlockChest || b instanceof BlockEnderChest || b instanceof BlockSkull || b instanceof BlockPane || b instanceof BlockFence || b instanceof BlockWall || b instanceof BlockGlass || b instanceof BlockPistonBase || b instanceof BlockPistonExtension || b instanceof BlockPistonMoving || b instanceof BlockStainedGlass || b instanceof BlockTrapDoor;
     }
 
     private static boolean isSafeToWalkOn(BlockPos block) {
         IBlockState bs = Main.mc.world.getBlockState(block);
         IBlockState above = Main.mc.world.getBlockState(block.add(0, 1, 0));
-        if (bs != null && above != null) {
-            final Block b = bs.getBlock();
-            if(above.getBlock() instanceof BlockLiquid) return false;
-            return !(b instanceof BlockFence) && !(b instanceof BlockWall);
-        }
-        return false;
+        Block b = bs.getBlock();
+        if(above.getBlock() instanceof BlockLiquid) return false;
+        return !(b instanceof BlockFence) && !(b instanceof BlockWall);
     }
 
-    public Hub isHubExisting(final Vec3d loc) {
-        for (final Hub hub : hubs) {
+    public Hub isHubExisting(Vec3d loc) {
+        for (Hub hub : hubs) {
             if (hub.getLoc().x == loc.x && hub.getLoc().y == loc.y && hub.getLoc().z == loc.z) {
                 return hub;
             }
         }
-        for (final Hub hub : hubsToWork) {
+        for (Hub hub : hubsToWork) {
             if (hub.getLoc().x == loc.x && hub.getLoc().y == loc.y && hub.getLoc().z == loc.z) {
                 return hub;
             }
@@ -160,8 +169,8 @@ public class AStarCustomPathfinder {
         return null;
     }
 
-    public boolean addHub(final Hub parent, final Vec3d loc, final double cost) {
-        final Hub existingHub = isHubExisting(loc);
+    public boolean addHub(Hub parent, Vec3d loc, double cost) {
+        Hub existingHub = isHubExisting(loc);
         double totalCost = cost;
         if (parent != null) {
             totalCost += parent.getTotalCost();
@@ -173,11 +182,11 @@ public class AStarCustomPathfinder {
                 (path = parent.getPath()).add(loc);
                 return true;
             }
-            final ArrayList<Vec3d> path = new ArrayList<>(parent.getPath());
+            ArrayList<Vec3d> path = new ArrayList<>(parent.getPath());
             path.add(loc);
             hubsToWork.add(new Hub(loc, parent, path, loc.squareDistanceTo(endVec3), cost, totalCost));
         } else if (existingHub.getCost() > cost) {
-            final ArrayList<Vec3d> path = new ArrayList<>(parent.getPath());
+            ArrayList<Vec3d> path = new ArrayList<>(parent.getPath());
             path.add(loc);
             existingHub.setLoc(loc);
             existingHub.setParent(parent);
@@ -197,7 +206,7 @@ public class AStarCustomPathfinder {
         private double cost;
         private double totalCost;
 
-        public Hub(final Vec3d loc, final Hub parent, final ArrayList<Vec3d> path, final double squareDistanceToFromTarget, final double cost, final double totalCost) {
+        public Hub(Vec3d loc, Hub parent, ArrayList<Vec3d> path, double squareDistanceToFromTarget, double cost, double totalCost) {
             this.loc = null;
             this.parent = null;
             this.loc = loc;
@@ -228,23 +237,23 @@ public class AStarCustomPathfinder {
             return cost;
         }
 
-        public void setLoc(final Vec3d loc) {
+        public void setLoc(Vec3d loc) {
             this.loc = loc;
         }
 
-        public void setParent(final Hub parent) {
+        public void setParent(Hub parent) {
             this.parent = parent;
         }
 
-        public void setPath(final ArrayList<Vec3d> path) {
+        public void setPath(ArrayList<Vec3d> path) {
             this.path = path;
         }
 
-        public void setSquareDistanceToFromTarget(final double squareDistanceToFromTarget) {
+        public void setSquareDistanceToFromTarget(double squareDistanceToFromTarget) {
             this.squareDistanceToFromTarget = squareDistanceToFromTarget;
         }
 
-        public void setCost(final double cost) {
+        public void setCost(double cost) {
             this.cost = cost;
         }
 
@@ -252,14 +261,14 @@ public class AStarCustomPathfinder {
             return totalCost;
         }
 
-        public void setTotalCost(final double totalCost) {
+        public void setTotalCost(double totalCost) {
             this.totalCost = totalCost;
         }
     }
 
     public static class CompareHub implements Comparator<Hub> {
         @Override
-        public int compare(final Hub o1, final Hub o2) {
+        public int compare(Hub o1, Hub o2) {
             return (int) (o1.getSquareDistanceToFromTarget() + o1.getTotalCost() - (o2.getSquareDistanceToFromTarget() + o2.getTotalCost()));
         }
     }

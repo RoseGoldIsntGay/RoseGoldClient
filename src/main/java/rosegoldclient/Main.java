@@ -4,21 +4,16 @@ import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import gg.essential.api.utils.Multithreading;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockFarmland;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.entity.Entity;
 import net.minecraft.inventory.Slot;
-import net.minecraft.network.play.client.CPacketEntityAction;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.Tuple;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
@@ -86,7 +81,6 @@ public class Main {
     public static boolean doAutoWalk = false;
     public static boolean autoProfessions = false;
     public static boolean toggleSneak = false;
-    private boolean isSneaking = false;
 
     public static final List<String> alphaNumeric = Arrays.asList("0123456789 abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".split(""));
     public static List<String> shuffle = Arrays.asList("0123456789 abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".split(""));
@@ -233,7 +227,7 @@ public class Main {
         MinecraftForge.EVENT_BUS.register(new Phase());
         MinecraftForge.EVENT_BUS.register(new KillAura());
         MinecraftForge.EVENT_BUS.register(new BlockBanPacket());
-        MinecraftForge.EVENT_BUS.register(new NoRotate());
+        //MinecraftForge.EVENT_BUS.register(new NoRotate());
         MinecraftForge.EVENT_BUS.register(new Watermark());
         MinecraftForge.EVENT_BUS.register(new SpellAura());
         MinecraftForge.EVENT_BUS.register(new SpellCaster());
@@ -255,6 +249,7 @@ public class Main {
         MinecraftForge.EVENT_BUS.register(new AutoHeal());
         MinecraftForge.EVENT_BUS.register(new ToggleSneak());
         MinecraftForge.EVENT_BUS.register(new RareMobESP());
+        MinecraftForge.EVENT_BUS.register(new AutoLootRun());
 
         configFile.initialize();
 
@@ -269,6 +264,7 @@ public class Main {
         ClientCommandHandler.instance.registerCommand(new RGTP());
         ClientCommandHandler.instance.registerCommand(new Goto());
         ClientCommandHandler.instance.registerCommand(new WalkPoint());
+        ClientCommandHandler.instance.registerCommand(new AutoLootRunCommand());
 
         for (KeyBinding keyBinding : keybinds) {
             ClientRegistry.registerKeyBinding(keyBinding);
