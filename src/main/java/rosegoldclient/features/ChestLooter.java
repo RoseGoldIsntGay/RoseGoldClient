@@ -1,5 +1,13 @@
 package rosegoldclient.features;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.ContainerChest;
@@ -10,18 +18,12 @@ import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import rosegoldclient.Main;
 import rosegoldclient.events.SecondEvent;
-import rosegoldclient.events.TickEndEvent;
-import rosegoldclient.utils.Utils;
-
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class ChestLooter {
     private long lastClickTime = 0L;
     private final List<Map.Entry<Slot, Boolean>> items = new ArrayList<>(27);
-    private Set<String> leftClick = Stream.of("Kaian Scroll", "Fairy Powder", "Stolen Goods", "Golden Avia Feather", "Fiery Aura", "Windy Aura", "Watery Aura", "Sought-After Ore", "Ancient Currency", "Glimmering Coin", "Doom Stone", "Lunar Charm", "Nose Ring", "Decaying Heart", "Stolen Pearls", "Antique Metal", "Luxroot Cuttings", "Emerald").collect(Collectors.toSet());
-    private final Set<String> shiftClick = Stream.of("Fire Powder IV", "Air Powder IV", "Thunder Powder IV", "Water Powder IV", "Earth Powder IV").collect(Collectors.toSet());
+    private Set<String> shiftClick = Stream.of(  "Kaian Scroll", "Fairy Powder", "Stolen Goods", "Golden Avia Feather", "Fiery Aura", "Windy Aura", "Watery Aura", "Sought-After Ore", "Ancient Currency", "Glimmering Coin", "Doom Stone", "Lunar Charm", "Nose Ring", "Decaying Heart", "Stolen Pearls", "Antique Metal", "Luxroot Cuttings", "Emerald",
+            "Fire Powder IV", "Air Powder IV", "Thunder Powder IV", "Water Powder IV", "Earth Powder IV").collect(Collectors.toSet());
 
     @SubscribeEvent
     public void onGuiOpen(GuiOpenEvent event) {
@@ -39,10 +41,7 @@ public class ChestLooter {
                 for (Slot slot : chestSlots) {
                     if (!slot.getHasStack()) continue;
                     String itemName = StringUtils.stripControlCodes(slot.getStack().getDisplayName());
-                    if (leftClick.stream().anyMatch(itemName::contains)) {
-                        map.put(slot, false);
-                        continue;
-                    }
+
                     if(shiftClick.stream().anyMatch(itemName::contains)) {
                         map.put(slot, true);
                     }
@@ -69,6 +68,6 @@ public class ChestLooter {
             String[] split = Main.configFile.chestLootFilter.split(",");
             mainStream.addAll(Stream.of(split).collect(Collectors.toSet()));
         }
-        leftClick = mainStream;
+        shiftClick = mainStream;
     }
 }
